@@ -9,7 +9,7 @@ services:
       - .development.env
     volumes:
       - .:/app
-      - ./app/node_modules
+      - /app/node_modules
     ports:
       - 3000:3000
       - 9229:9229
