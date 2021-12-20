@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { Roles } from 'src/auth/roles.decorator';
-import { RoleGuard } from 'src/auth/roles.guard';
+import { AuthGuard } from '../auth/auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { RoleGuard } from '../auth/roles.guard';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/creat-user.dto';
 import { User } from './user.entity';
@@ -11,7 +11,7 @@ import { UsersService } from './users.service';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private userService: UsersService) {}
+  constructor(private readonly userService: UsersService) {}
 
   @ApiOperation({ summary: 'Create user' })
   @ApiResponse({ status: 200, type: User })

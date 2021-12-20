@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RolesService } from 'src/roles/roles.service';
+import { RolesService } from '../roles/roles.service';
 import { Repository } from 'typeorm';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/creat-user.dto';
@@ -9,8 +9,8 @@ import { User } from './user.entity';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private userRepository: Repository<User>,
-    private roleService: RolesService,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly roleService: RolesService,
   ) {}
 
   async createUser(dto: CreateUserDto): Promise<User> {
