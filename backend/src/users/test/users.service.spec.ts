@@ -10,17 +10,25 @@ import { UsersService } from '../users.service';
 import { User } from '../user.entity';
 import { Role } from '../../roles/roles-entity';
 import { RolesService } from '../../roles/roles.service';
+import { TestHelper } from '../../util/test-helper';
+import { ConfigModule } from '@nestjs/config';
 
 describe('UsersService', () => {
   let userService: UsersService;
   let roleService: RolesService;
   let userRepository: Repository<User>;
   let roleRepository: Repository<Role>;
-
   const connectionName = 'tests';
 
+  const testHelper = new TestHelper(connectionName, [Role, User]);
+
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
+    await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          envFilePath: `.${process.env.NODE_ENV}.env`,
+        }),
+      ],
       providers: [
         UsersService,
         {
@@ -35,19 +43,7 @@ describe('UsersService', () => {
       ],
     }).compile();
 
-    let connection = await createConnection({
-      type: 'postgres',
-      database: 'tests',
-      host: 'localhost',
-      port: 5432,
-      username: 'vlad',
-      password: 'admin',
-      dropSchema: true,
-      entities: [User, Role],
-      synchronize: true,
-      logging: false,
-      name: connectionName,
-    });
+    const connection = await testHelper.createTestConnection();
 
     userRepository = getRepository(User, connectionName);
     roleRepository = getRepository(Role, connectionName);
@@ -66,10 +62,10 @@ describe('UsersService', () => {
     expect(userService).toBeDefined();
   });
   describe('Create user test', () => {
-    const email: string = 'test@test.com';
-    const password: string = 'test';
-    const roleValue: string = 'USER';
-    const roleDescription: string = 'Simple user';
+    const email = 'test@test.com';
+    const password = 'test';
+    const roleValue = 'USER';
+    const roleDescription = 'Simple user';
 
     beforeEach(async () => {
       await roleService.create({
@@ -92,10 +88,10 @@ describe('UsersService', () => {
     });
   });
   describe('Get user by email test', () => {
-    const email: string = 'test@test.com';
-    const password: string = 'test';
-    const roleValue: string = 'USER';
-    const roleDescription: string = 'Simple user';
+    const email = 'test@test.com';
+    const password = 'test';
+    const roleValue = 'USER';
+    const roleDescription = 'Simple user';
 
     beforeEach(async () => {
       await roleService.create({
@@ -120,11 +116,11 @@ describe('UsersService', () => {
     });
   });
   describe('Ban user test', () => {
-    const email: string = 'test@test.com';
-    const password: string = 'test';
-    const roleValue: string = 'USER';
-    const roleDescription: string = 'Simple user';
-    const banReason: string = 'Using bad words';
+    const email = 'test@test.com';
+    const password = 'test';
+    const roleValue = 'USER';
+    const roleDescription = 'Simple user';
+    const banReason = 'Using bad words';
     let createdUser: User;
 
     beforeEach(async () => {
