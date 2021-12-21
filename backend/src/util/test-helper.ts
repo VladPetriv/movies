@@ -10,11 +10,11 @@ export class TestHelper {
   public async createTestConnection(): Promise<Connection> {
     const connection = await createConnection({
       type: 'postgres',
-      database: 'tests',
-      host: 'localhost',
-      port: 5432,
-      username: 'vlad',
-      password: 'admin',
+      database: process.env.POSTGRES_DB,
+      host: process.env.POSTGRES_HOST,
+      port: Number(process.env.POSTGRES_PORT),
+      username: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
       dropSchema: true,
       entities: this.entities,
       synchronize: true,

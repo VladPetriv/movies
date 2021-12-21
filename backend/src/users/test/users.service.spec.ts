@@ -1,17 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import {
-  Repository,
-  createConnection,
-  getConnection,
-  getRepository,
-} from 'typeorm';
+import { Repository, getConnection, getRepository } from 'typeorm';
+import { ConfigModule } from '@nestjs/config';
 import { UsersService } from '../users.service';
 import { User } from '../user.entity';
 import { Role } from '../../roles/roles-entity';
 import { RolesService } from '../../roles/roles.service';
 import { TestHelper } from '../../util/test-helper';
-import { ConfigModule } from '@nestjs/config';
 
 describe('UsersService', () => {
   let userService: UsersService;
