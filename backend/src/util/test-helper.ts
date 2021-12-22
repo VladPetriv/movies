@@ -3,12 +3,14 @@ import { Connection, createConnection } from 'typeorm';
 export class TestHelper {
   name: string;
   entities: any;
+
   constructor(name: string, entities: any) {
     this.name = name;
     this.entities = entities;
   }
+
   public async createTestConnection(): Promise<Connection> {
-    const connection = await createConnection({
+    return await createConnection({
       type: 'postgres',
       database: process.env.POSTGRES_DB,
       host: process.env.POSTGRES_HOST,
@@ -21,6 +23,5 @@ export class TestHelper {
       logging: false,
       name: this.name,
     });
-    return connection;
   }
 }

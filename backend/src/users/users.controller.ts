@@ -7,6 +7,7 @@ import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/creat-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
+import { AddRoleDto } from './dto/add-role.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -15,7 +16,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Create user' })
   @ApiResponse({ status: 200, type: User })
-  @Post()
+  @Post('/create')
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.userService.createUser(createUserDto);
   }
@@ -29,11 +30,19 @@ export class UsersController {
     return this.userService.getAllUsers();
   }
 
+  @ApiOperation({ summary: 'Add new Role' })
+  @ApiResponse({ status: 200, type: AddRoleDto })
+  @Roles('ADMIN')
+  @UseGuards(AuthGuard, RoleGuard)
+  @Post('/addrole')
+  addRole(@Body() addRoleDto: AddRoleDto): Promise<AddRoleDto> {
+    return this.userService.addRole(addRoleDto);
+  }
   @ApiOperation({ summary: 'Ban user' })
   @ApiResponse({ status: 200, type: User })
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
-  @Post()
+  @Post('/ban')
   banUser(@Body() banUserDto: BanUserDto): Promise<User> {
     return this.userService.banUser(banUserDto);
   }

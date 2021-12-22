@@ -3,19 +3,21 @@ import {
   ExecutionContext,
   HttpException,
   HttpStatus,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
 import { Observable } from 'rxjs';
+import { JwtService } from '@nestjs/jwt';
+import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from './roles.decorator';
 
+@Injectable()
 export class RoleGuard implements CanActivate {
   constructor(private jwtService: JwtService, private reflector: Reflector) {}
+
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const req = context.switchToHttp().getRequest();
     try {
       const requiredRoles = this.reflector.getAllAndOverride<string[]>(
         ROLES_KEY,
@@ -24,6 +26,7 @@ export class RoleGuard implements CanActivate {
       if (!requiredRoles) {
         return true;
       }
+      const req = context.switchToHttp().getRequest();
       const authHeader = req.headers.authorization;
       const bearer = authHeader.split(' ')[0];
       const token = authHeader.split(' ')[1];
@@ -33,12 +36,11 @@ export class RoleGuard implements CanActivate {
           message: 'User is not logined',
         });
       }
-
       const user = this.jwtService.verify(token);
       req.user = user;
       return user.roles.some((role) => requiredRoles.includes(role.value));
-    } catch (err) {
-      throw new HttpException('No access', HttpStatus.FORBIDDEN);
+    } catch (e) {
+      throw new HttpException('No accsess', HttpStatus.FORBIDDEN);
     }
   }
 }
