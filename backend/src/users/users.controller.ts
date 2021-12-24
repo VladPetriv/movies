@@ -35,7 +35,7 @@ export class UsersController {
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
   @Post('/addrole')
-  addRole(@Body() addRoleDto: AddRoleDto): Promise<AddRoleDto> {
+  addRole(@Body() addRoleDto: AddRoleDto): Promise<User> {
     return this.userService.addRole(addRoleDto);
   }
   @ApiOperation({ summary: 'Ban user' })

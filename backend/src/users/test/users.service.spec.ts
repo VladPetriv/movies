@@ -4,7 +4,7 @@ import { Repository, getConnection, getRepository } from 'typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UsersService } from '../users.service';
 import { User } from '../user.entity';
-import { Role } from '../../roles/roles-entity';
+import { Role } from '../../roles/roles.entity';
 import { RolesService } from '../../roles/roles.service';
 import { TestHelper } from '../../util/test-helper';
 
@@ -17,7 +17,7 @@ describe('UsersService', () => {
 
   const testHelper = new TestHelper(connectionName, [Role, User]);
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     await Test.createTestingModule({
       imports: [
         ConfigModule.forRoot({
@@ -42,20 +42,27 @@ describe('UsersService', () => {
 
     userRepository = getRepository(User, connectionName);
     roleRepository = getRepository(Role, connectionName);
-    userService = new UsersService(
-      userRepository,
-      new RolesService(roleRepository),
-    );
     roleService = new RolesService(roleRepository);
+    userService = new UsersService(userRepository, roleService);
     return connection;
   });
-  afterEach(async () => {
+  afterAll(async () => {
     await getConnection(connectionName).close();
   });
 
   it('should be defined', () => {
     expect(userService).toBeDefined();
   });
+
+  describe('Get all users test', () => {
+    it('should return array of all users', async () => {
+      const users = await userService.getAllUsers();
+
+      expect(users).toBeDefined();
+      expect(users).toStrictEqual([]);
+    });
+  });
+
   describe('Create user test', () => {
     const email = 'test@test.com';
     const password = 'test';
@@ -74,27 +81,18 @@ describe('UsersService', () => {
         email,
         password,
       });
+
       expect(user).toBeDefined();
       expect(user.email).toBe(email);
       expect(user.password).toBe(password);
       expect(user.ban).toBe(false);
-      expect(user['roles'][0].value).toBe(roleValue);
-      expect(user['roles'][0].description).toBe(roleDescription);
+      expect(user['roles']).toBeDefined();
     });
   });
   describe('Get user by email test', () => {
     const email = 'test@test.com';
     const password = 'test';
-    const roleValue = 'USER';
-    const roleDescription = 'Simple user';
 
-    beforeEach(async () => {
-      await roleService.create({
-        value: roleValue,
-        description: roleDescription,
-      });
-      await userService.createUser({ email, password });
-    });
     it('should return user by email', async () => {
       const user = await userService.getUserByEmail(email);
       expect(user).toBeDefined();
@@ -103,26 +101,13 @@ describe('UsersService', () => {
       expect(user.ban).toBe(false);
     });
   });
-  describe('Get all users test', () => {
-    it('should return array of all users', async () => {
-      const users = await userService.getAllUsers();
-      expect(users).toBeDefined();
-      expect(users).toStrictEqual([]);
-    });
-  });
   describe('Ban user test', () => {
-    const email = 'test@test.com';
+    const email = 'test1@test.com';
     const password = 'test';
-    const roleValue = 'USER';
-    const roleDescription = 'Simple user';
     const banReason = 'Using bad words';
     let createdUser: User;
 
     beforeEach(async () => {
-      await roleService.create({
-        value: roleValue,
-        description: roleDescription,
-      });
       createdUser = await userService.createUser({ email, password });
     });
     it('should ban user', async () => {
@@ -134,6 +119,51 @@ describe('UsersService', () => {
       expect(user).toBeDefined();
       expect(user.ban).toBe(true);
       expect(user.banReason).toBe(banReason);
+    });
+  });
+  describe('Add role test', () => {
+    const email = 'test2@test.com';
+    const password = 'test';
+    const newRoleValue = 'ADMIN';
+    const newRoleDescription = 'Super user';
+    let createdUser: User;
+
+    beforeAll(async () => {
+      await roleService.create({
+        value: newRoleValue,
+        description: newRoleDescription,
+      });
+      createdUser = await userService.createUser({ email, password });
+    });
+    it('should add new role for user', async () => {
+      const user = await userService.addRole({
+        userId: createdUser.id,
+        value: 'ADMIN',
+      });
+
+      expect(user).toBeDefined();
+      expect(user['roles'].length).toBe(2);
+      expect(user['roles'][1].value).toBe(newRoleValue);
+    });
+    it('should throw an error that role not exist', async () => {
+      try {
+        await userService.addRole({
+          userId: createdUser.id,
+          value: '',
+        });
+      } catch (err) {
+        expect(err.message).toBe('User or role not found');
+      }
+    });
+    it('should throw an error that user not exist', async () => {
+      try {
+        await userService.addRole({
+          userId: 123,
+          value: 'ADMIN',
+        });
+      } catch (err) {
+        expect(err.message).toBe('User or role not found');
+      }
     });
   });
 });

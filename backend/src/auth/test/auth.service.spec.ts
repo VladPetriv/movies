@@ -7,7 +7,7 @@ import { AuthService } from '../auth.service';
 import { UsersService } from '../../users/users.service';
 import { User } from '../../users/user.entity';
 import { RolesService } from '../../roles/roles.service';
-import { Role } from '../../roles/roles-entity';
+import { Role } from '../../roles/roles.entity';
 import { TestHelper } from '../../util/test-helper';
 
 describe('AuthService', () => {

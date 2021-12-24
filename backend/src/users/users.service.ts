@@ -15,41 +15,43 @@ export class UsersService {
   ) {}
 
   async createUser(dto: CreateUserDto): Promise<User> {
-    const user = await this.userRepository.create(dto);
     const role = await this.roleService.getRoleByValue('USER');
-    user.roles = [role];
+    const user = this.userRepository.create({ ...dto, roles: [role] });
     await this.userRepository.save(user);
     return user;
   }
+
   async getUserByEmail(email): Promise<User> {
-    const user = await this.userRepository.findOne({
+    return await this.userRepository.findOne({
       where: { email },
       relations: ['roles'],
     });
-    return user;
   }
+
   async getAllUsers(): Promise<User[]> {
-    const users = await this.userRepository.find({ relations: ['roles'] });
-    return users;
+    return await this.userRepository.find({
+      relations: ['roles'],
+    });
   }
-  async addRole(dto: AddRoleDto): Promise<AddRoleDto> {
+
+  async addRole(dto: AddRoleDto): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: dto.userId },
       relations: ['roles'],
     });
-
     const role = await this.roleService.getRoleByValue(dto.value);
-    console.log(user, role);
     if (role && user) {
       user.roles.push(role);
       await this.userRepository.save(user);
-      return dto;
+      return user;
     }
     throw new HttpException('User or role not found', HttpStatus.NOT_FOUND);
   }
+
   async banUser(dto: BanUserDto): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: dto.userId },
+      relations: ['roles'],
     });
     user.ban = true;
     user.banReason = dto.reason;
