@@ -4,9 +4,12 @@ import {
   Column,
   JoinTable,
   ManyToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../roles/roles.entity';
+import { Favourite } from '../favourite/entities/favourite.entity';
 
 @Entity()
 export class User {
@@ -45,4 +48,10 @@ export class User {
   @ManyToMany(() => Role)
   @JoinTable()
   roles: Role[];
+
+  @OneToOne(() => Favourite, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  favourite: Favourite;
 }

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -45,5 +45,14 @@ export class UsersController {
   @Post('/ban')
   banUser(@Body() banUserDto: BanUserDto): Promise<User> {
     return this.userService.banUser(banUserDto);
+  }
+
+  @ApiOperation({ summary: 'Delete user' })
+  @ApiResponse({ status: 200, type: 'User was deleted' })
+  @Roles('USER')
+  @UseGuards(AuthGuard)
+  @Delete()
+  deleteUser(@Body() email: string): Promise<string> {
+    return this.userService.deleteUser(email);
   }
 }

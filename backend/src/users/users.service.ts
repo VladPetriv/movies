@@ -6,17 +6,24 @@ import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/creat-user.dto';
 import { User } from './user.entity';
 import { AddRoleDto } from './dto/add-role.dto';
+import { FavouriteService } from '../favourite/favourite.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly roleService: RolesService,
+    private readonly favouriteService: FavouriteService,
   ) {}
 
   async createUser(dto: CreateUserDto): Promise<User> {
     const role = await this.roleService.getRoleByValue('USER');
-    const user = this.userRepository.create({ ...dto, roles: [role] });
+    const favourite = await this.favouriteService.create();
+    const user = this.userRepository.create({
+      ...dto,
+      roles: [role],
+      favourite: favourite,
+    });
     await this.userRepository.save(user);
     return user;
   }
@@ -57,5 +64,14 @@ export class UsersService {
     user.banReason = dto.reason;
     await this.userRepository.save(user);
     return user;
+  }
+
+  async deleteUser(email: string): Promise<string> {
+    const user = await this.getUserByEmail(email);
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+    await this.userRepository.delete({ id: user.id });
+    return 'User was deleted';
   }
 }

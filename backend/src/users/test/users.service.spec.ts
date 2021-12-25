@@ -7,15 +7,26 @@ import { User } from '../user.entity';
 import { Role } from '../../roles/roles.entity';
 import { RolesService } from '../../roles/roles.service';
 import { TestHelper } from '../../util/test-helper';
+import { FavouriteService } from '../../favourite/favourite.service';
+import { Favourite } from '../../favourite/entities/favourite.entity';
+import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
 
 describe('UsersService', () => {
   let userService: UsersService;
   let roleService: RolesService;
+  let favouriteService: FavouriteService;
   let userRepository: Repository<User>;
   let roleRepository: Repository<Role>;
+  let favouriteRepository: Repository<Favourite>;
+  let favouriteItemRepository: Repository<FavouriteItem>;
   const connectionName = 'tests';
 
-  const testHelper = new TestHelper(connectionName, [Role, User]);
+  const testHelper = new TestHelper(connectionName, [
+    Role,
+    User,
+    Favourite,
+    FavouriteItem,
+  ]);
 
   beforeAll(async () => {
     await Test.createTestingModule({
@@ -35,6 +46,15 @@ describe('UsersService', () => {
           provide: getRepositoryToken(Role),
           useClass: Repository,
         },
+        FavouriteService,
+        {
+          provide: getRepositoryToken(Favourite),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(FavouriteItem),
+          useClass: Repository,
+        },
       ],
     }).compile();
 
@@ -42,8 +62,18 @@ describe('UsersService', () => {
 
     userRepository = getRepository(User, connectionName);
     roleRepository = getRepository(Role, connectionName);
+    favouriteRepository = getRepository(Favourite, connectionName);
+    favouriteItemRepository = getRepository(FavouriteItem, connectionName);
+    favouriteService = new FavouriteService(
+      favouriteRepository,
+      favouriteItemRepository,
+    );
     roleService = new RolesService(roleRepository);
-    userService = new UsersService(userRepository, roleService);
+    userService = new UsersService(
+      userRepository,
+      roleService,
+      favouriteService,
+    );
     return connection;
   });
   afterAll(async () => {
@@ -87,6 +117,7 @@ describe('UsersService', () => {
       expect(user.password).toBe(password);
       expect(user.ban).toBe(false);
       expect(user['roles']).toBeDefined();
+      expect(user['favourite']).toBeDefined();
     });
   });
   describe('Get user by email test', () => {
@@ -164,6 +195,14 @@ describe('UsersService', () => {
       } catch (err) {
         expect(err.message).toBe('User or role not found');
       }
+    });
+  });
+  describe('Delete user test', () => {
+    const email = 'test2@test.com';
+    it('should detele user', async () => {
+      const user = await userService.deleteUser(email);
+      expect(user).toBeDefined();
+      expect(user).toBe('User was deleted');
     });
   });
 });
