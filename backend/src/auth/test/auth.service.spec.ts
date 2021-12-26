@@ -9,6 +9,9 @@ import { User } from '../../users/user.entity';
 import { RolesService } from '../../roles/roles.service';
 import { Role } from '../../roles/roles.entity';
 import { TestHelper } from '../../util/test-helper';
+import { Favourite } from '../../favourite/entities/favourite.entity';
+import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
+import { FavouriteService } from '../../favourite/favourite.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -16,8 +19,17 @@ describe('AuthService', () => {
   let userRepository: Repository<User>;
   let roleService: RolesService;
   let roleRepository: Repository<Role>;
+  let favouriteRepository: Repository<Favourite>;
+  let favouriteItemsRepository: Repository<FavouriteItem>;
+  let favouriteService: FavouriteService;
+
   const connectionName = 'tests';
-  const testHelper = new TestHelper(connectionName, [User, Role]);
+  const testHelper = new TestHelper(connectionName, [
+    User,
+    Role,
+    Favourite,
+    FavouriteItem,
+  ]);
 
   beforeEach(async () => {
     await Test.createTestingModule({
@@ -44,6 +56,15 @@ describe('AuthService', () => {
           provide: getRepositoryToken(Role),
           useClass: Repository,
         },
+        FavouriteService,
+        {
+          provide: getRepositoryToken(Favourite),
+          useClass: Repository,
+        },
+        {
+          provide: getRepositoryToken(FavouriteItem),
+          useClass: Repository,
+        },
       ],
     }).compile();
 
@@ -52,7 +73,17 @@ describe('AuthService', () => {
     roleRepository = getRepository(Role, connectionName);
     roleService = new RolesService(roleRepository);
     userRepository = getRepository(User, connectionName);
-    userService = new UsersService(userRepository, roleService);
+    favouriteRepository = getRepository(Favourite, connectionName);
+    favouriteItemsRepository = getRepository(FavouriteItem, connectionName);
+    favouriteService = new FavouriteService(
+      favouriteRepository,
+      favouriteItemsRepository,
+    );
+    userService = new UsersService(
+      userRepository,
+      roleService,
+      favouriteService,
+    );
     service = new AuthService(userService, new JwtService({}));
     return connection;
   });

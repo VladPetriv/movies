@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FavouriteController } from '../favourite.controller';
 import { FavouriteService } from '../favourite.service';
 import { AuthGuard } from '../../auth/auth.guard';
-import exp from 'constants';
 
 describe('FavouriteController', () => {
   let controller: FavouriteController;
