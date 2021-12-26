@@ -11,12 +11,15 @@ export class RolesService {
   ) {}
 
   async create(dto: CreateRoleDto): Promise<Role> {
-    const role = await this.roleRepository.create(dto);
-    this.roleRepository.save(role);
-    return role;
+    try {
+      const role = await this.roleRepository.create(dto);
+      await this.roleRepository.save(role);
+      return role;
+    } catch (err) {
+      throw new Error(err.message);
+    }
   }
   async getRoleByValue(value: string): Promise<Role> {
-    const role = await this.roleRepository.findOne({ where: { value } });
-    return role;
+    return await this.roleRepository.findOne({ where: { value } });
   }
 }
