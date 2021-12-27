@@ -9,6 +9,8 @@ import { Role } from './roles/roles.entity';
 import { FavouriteModule } from './favourite/favourite.module';
 import { Favourite } from './favourite/entities/favourite.entity';
 import { FavouriteItem } from './favourite/entities/favourite-item.entity';
+import { MoviesModule } from './movies/movies.module';
+import { Movie } from './movies/movie.entity';
 
 @Module({
   imports: [
@@ -22,13 +24,14 @@ import { FavouriteItem } from './favourite/entities/favourite-item.entity';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [User, Role, Favourite, FavouriteItem],
+      entities: [User, Role, Favourite, FavouriteItem, Movie],
       synchronize: true,
     }),
     UsersModule,
     AuthModule,
     RolesModule,
     FavouriteModule,
+    MoviesModule,
   ],
 })
 export class AppModule {}
