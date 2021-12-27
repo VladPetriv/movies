@@ -12,6 +12,8 @@ import { TestHelper } from '../../util/test-helper';
 import { Favourite } from '../../favourite/entities/favourite.entity';
 import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
 import { FavouriteService } from '../../favourite/favourite.service';
+import { MoviesService } from '../../movies/movies.service';
+import { Movie } from '../../movies/movie.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -22,6 +24,8 @@ describe('AuthService', () => {
   let favouriteRepository: Repository<Favourite>;
   let favouriteItemsRepository: Repository<FavouriteItem>;
   let favouriteService: FavouriteService;
+  let movieRepository: Repository<Movie>;
+  let movieService: MoviesService;
 
   const connectionName = 'tests';
   const testHelper = new TestHelper(connectionName, [
@@ -29,6 +33,7 @@ describe('AuthService', () => {
     Role,
     Favourite,
     FavouriteItem,
+    Movie,
   ]);
 
   beforeEach(async () => {
@@ -65,6 +70,11 @@ describe('AuthService', () => {
           provide: getRepositoryToken(FavouriteItem),
           useClass: Repository,
         },
+        MoviesService,
+        {
+          provide: getRepositoryToken(Movie),
+          useClass: Repository,
+        },
       ],
     }).compile();
 
@@ -75,9 +85,12 @@ describe('AuthService', () => {
     userRepository = getRepository(User, connectionName);
     favouriteRepository = getRepository(Favourite, connectionName);
     favouriteItemsRepository = getRepository(FavouriteItem, connectionName);
+    movieRepository = getRepository(Movie, connectionName);
+    movieService = new MoviesService(movieRepository);
     favouriteService = new FavouriteService(
       favouriteRepository,
       favouriteItemsRepository,
+      movieService,
     );
     userService = new UsersService(
       userRepository,

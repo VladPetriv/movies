@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Favourite } from './entities/favourite.entity';
 import { Repository } from 'typeorm';
 import { FavouriteItem } from './entities/favourite-item.entity';
+import { Movie } from '../movies/movie.entity';
+import { MoviesService } from '../movies/movies.service';
+import { CreateFavouriteItemDto } from './dto/create-favouriteItem.dto';
 
 @Injectable()
 export class FavouriteService {
@@ -11,30 +14,44 @@ export class FavouriteService {
     private readonly favouriteRepository: Repository<Favourite>,
     @InjectRepository(FavouriteItem)
     private readonly favouriteItemRepository: Repository<FavouriteItem>,
+    private readonly movieService: MoviesService,
   ) {}
 
   async create(): Promise<Favourite> {
-    const favourite = this.favouriteRepository.create();
+    const favourite: Favourite = this.favouriteRepository.create();
     await this.favouriteRepository.save(favourite);
     return favourite;
   }
 
   async getAllFavouriteItems(favourite_id: number): Promise<FavouriteItem[]> {
-    const favourite = await this.favouriteRepository.findOne(favourite_id);
+    const favourite: Favourite = await this.favouriteRepository.findOne(
+      favourite_id,
+    );
     return await this.favouriteItemRepository.find({
       where: { favourite: favourite },
     });
   }
 
-  async createFavouriteItem(favouriteId: number): Promise<FavouriteItem> {
-    const favourite = await this.favouriteRepository.findOne({
+  async createFavouriteItem(
+    dto: CreateFavouriteItemDto,
+  ): Promise<FavouriteItem> {
+    const favourite: Favourite = await this.favouriteRepository.findOne({
       where: {
-        id: favouriteId,
+        id: dto.favourite_id,
       },
     });
-    const favouriteItem = await this.favouriteItemRepository.create({
-      favourite: favourite,
-    });
+    const movie: Movie = await this.movieService.getOneMovie(dto.movie_id);
+    if (!movie || !favourite) {
+      throw new HttpException(
+        'Movie or favourite not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    const favouriteItem: FavouriteItem =
+      await this.favouriteItemRepository.create({
+        favourite: favourite,
+        movie: movie,
+      });
     await this.favouriteItemRepository.save(favouriteItem);
     return favouriteItem;
   }

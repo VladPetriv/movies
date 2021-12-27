@@ -4,7 +4,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RoleGuard } from '../auth/roles.guard';
 import { BanUserDto } from './dto/ban-user.dto';
-import { CreateUserDto } from './dto/creat-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { AddRoleDto } from './dto/add-role.dto';

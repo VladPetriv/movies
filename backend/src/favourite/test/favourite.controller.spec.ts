@@ -2,6 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { FavouriteController } from '../favourite.controller';
 import { FavouriteService } from '../favourite.service';
 import { AuthGuard } from '../../auth/auth.guard';
+import { CreateFavouriteItemDto } from '../dto/create-favouriteItem.dto';
+import { MoviesService } from '../../movies/movies.service';
 
 describe('FavouriteController', () => {
   let controller: FavouriteController;
@@ -17,17 +19,31 @@ describe('FavouriteController', () => {
         return {
           id: favouriteItem_id,
           favourite: favourite_id,
+          movie: 1,
         };
       },
     ),
-    createFavouriteItem: jest.fn((favourite_id: number) => {
+    createFavouriteItem: jest.fn((dto: CreateFavouriteItemDto) => {
       return {
         id: 1,
-        favourite: favourite_id,
+        favourite: dto.favourite_id,
+        movie: dto.movie_id,
       };
     }),
   };
 
+  const mockMovieService = {
+    getOneMovie: jest.fn((movie_id: number) => {
+      return {
+        id: movie_id,
+        title: 'test',
+        description: 'test',
+        year: 2020,
+        country: 'USA',
+        budget: '200000$',
+      };
+    }),
+  };
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FavouriteController],
@@ -35,6 +51,8 @@ describe('FavouriteController', () => {
     })
       .overrideGuard(AuthGuard)
       .useValue(mockGuard)
+      .overrideProvider(MoviesService)
+      .useValue(mockMovieService)
       .overrideProvider(FavouriteService)
       .useValue(mockFavouriteService)
       .compile();
@@ -52,12 +70,16 @@ describe('FavouriteController', () => {
     expect(controller.getOneFavouriteItem('1', '1')).toEqual({
       id: 1,
       favourite: 1,
+      movie: 1,
     });
   });
   it('should create favourite item', () => {
-    expect(controller.createFavouriteItem('1')).toEqual({
+    expect(
+      controller.createFavouriteItem({ favourite_id: 1, movie_id: 1 }),
+    ).toEqual({
       id: 1,
       favourite: 1,
+      movie: 1,
     });
   });
 });

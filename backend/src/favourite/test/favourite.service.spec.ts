@@ -6,14 +6,22 @@ import { FavouriteService } from '../favourite.service';
 import { Favourite } from '../entities/favourite.entity';
 import { FavouriteItem } from '../entities/favourite-item.entity';
 import { TestHelper } from '../../util/test-helper';
+import { Movie } from '../../movies/movie.entity';
+import { MoviesService } from '../../movies/movies.service';
 
 describe('FavouriteService', () => {
   let service: FavouriteService;
   let favouriteRepository: Repository<Favourite>;
   let favouriteItemRepository: Repository<FavouriteItem>;
+  let movieRepository: Repository<Movie>;
+  let movieService: MoviesService;
 
   const connectionName = 'tests';
-  const testHelper = new TestHelper(connectionName, [Favourite, FavouriteItem]);
+  const testHelper = new TestHelper(connectionName, [
+    Favourite,
+    FavouriteItem,
+    Movie,
+  ]);
 
   beforeAll(async () => {
     await Test.createTestingModule({
@@ -32,15 +40,23 @@ describe('FavouriteService', () => {
           provide: getRepositoryToken(FavouriteItem),
           useClass: Repository,
         },
+        MoviesService,
+        {
+          provide: getRepositoryToken(Movie),
+          useClass: Repository,
+        },
       ],
     }).compile();
     const connection = await testHelper.createTestConnection();
 
     favouriteRepository = getRepository(Favourite, connectionName);
     favouriteItemRepository = getRepository(FavouriteItem, connectionName);
+    movieRepository = getRepository(Movie, connectionName);
+    movieService = new MoviesService(movieRepository);
     service = new FavouriteService(
       favouriteRepository,
       favouriteItemRepository,
+      movieService,
     );
     return connection;
   });
@@ -74,9 +90,20 @@ describe('FavouriteService', () => {
   describe('Get one favourite items test', () => {
     let favourite;
     let favouriteItemId;
+    let movie;
     beforeEach(async () => {
+      movie = await movieService.createMovie({
+        title: 'test',
+        description: 'test',
+        year: 2020,
+        country: 'USA',
+        budget: '200000$',
+      });
       favourite = await service.create();
-      favouriteItemId = await service.createFavouriteItem(favourite.id);
+      favouriteItemId = await service.createFavouriteItem({
+        favourite_id: favourite.id,
+        movie_id: movie.id,
+      });
     });
     it('should return one favourite items', async () => {
       const favouriteItem = await service.getOneFavouriteItem(

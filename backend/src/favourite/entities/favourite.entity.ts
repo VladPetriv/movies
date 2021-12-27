@@ -8,6 +8,7 @@ export class Favourite {
 
   @OneToMany(() => FavouriteItem, (favouriteItem) => favouriteItem.favourite, {
     onDelete: 'CASCADE',
+    nullable: true,
   })
   favouriteItems: FavouriteItem[];
 }

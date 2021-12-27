@@ -1,8 +1,9 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FavouriteItem } from './entities/favourite-item.entity';
 import { FavouriteService } from './favourite.service';
 import { AuthGuard } from '../auth/auth.guard';
+import { CreateFavouriteItemDto } from './dto/create-favouriteItem.dto';
 
 @ApiTags('Favourite controller')
 @Controller('favourite')
@@ -36,10 +37,10 @@ export class FavouriteController {
   @ApiOperation({ summary: 'Create favourite item' })
   @ApiResponse({ status: 200, type: FavouriteItem })
   @UseGuards(AuthGuard)
-  @Get('/:favourite_id/create')
+  @Post('/create')
   createFavouriteItem(
-    @Param('favourite_id') favourite_id: string,
+    @Body() createFavouriteItemDto: CreateFavouriteItemDto,
   ): Promise<FavouriteItem> {
-    return this.favouriteService.createFavouriteItem(Number(favourite_id));
+    return this.favouriteService.createFavouriteItem(createFavouriteItemDto);
   }
 }

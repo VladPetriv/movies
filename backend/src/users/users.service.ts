@@ -1,13 +1,12 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { RolesService } from '../roles/roles.service';
 import { Repository } from 'typeorm';
-import { BanUserDto } from './dto/ban-user.dto';
-import { CreateUserDto } from './dto/creat-user.dto';
 import { User } from './user.entity';
-import { AddRoleDto } from './dto/add-role.dto';
+import { RolesService } from '../roles/roles.service';
 import { FavouriteService } from '../favourite/favourite.service';
-
+import { BanUserDto } from './dto/ban-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { AddRoleDto } from './dto/add-role.dto';
 @Injectable()
 export class UsersService {
   constructor(
