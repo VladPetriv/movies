@@ -11,6 +11,7 @@ import { Favourite } from './favourite/entities/favourite.entity';
 import { FavouriteItem } from './favourite/entities/favourite-item.entity';
 import { MoviesModule } from './movies/movies.module';
 import { Movie } from './movies/movie.entity';
+import { FilesModule } from './files/files.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { Movie } from './movies/movie.entity';
     RolesModule,
     FavouriteModule,
     MoviesModule,
+    FilesModule,
   ],
 })
 export class AppModule {}
