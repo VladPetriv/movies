@@ -9,7 +9,7 @@ import { RolesService } from './roles.service';
 export class RolesController {
   constructor(private roleService: RolesService) {}
 
-  @Post()
+  @Post('/create')
   create(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
     return this.roleService.create(createRoleDto);
   }

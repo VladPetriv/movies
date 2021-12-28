@@ -27,23 +27,23 @@ export class UsersService {
     return user;
   }
 
-  async getUserByEmail(email): Promise<User> {
+  async getUserByEmail(email: string): Promise<User> {
     return await this.userRepository.findOne({
       where: { email },
-      relations: ['roles'],
+      relations: ['roles', 'favourite'],
     });
   }
 
   async getAllUsers(): Promise<User[]> {
     return await this.userRepository.find({
-      relations: ['roles'],
+      relations: ['roles', 'favourite'],
     });
   }
 
   async addRole(dto: AddRoleDto): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: dto.userId },
-      relations: ['roles'],
+      relations: ['roles', 'favourite'],
     });
     const role = await this.roleService.getRoleByValue(dto.value);
     if (role && user) {
@@ -57,7 +57,7 @@ export class UsersService {
   async banUser(dto: BanUserDto): Promise<User> {
     const user = await this.userRepository.findOne({
       where: { id: dto.userId },
-      relations: ['roles'],
+      relations: ['roles', 'favourite'],
     });
     user.ban = true;
     user.banReason = dto.reason;
