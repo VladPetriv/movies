@@ -12,10 +12,9 @@ export class FilesService {
       if (!existsSync(filePath)) {
         mkdirSync(filePath, { recursive: true });
       }
-      writeFileSync(join(filePath, fileName), file.buffer);
+      writeFileSync(join(filePath, fileName), file.buffer || file);
       return fileName;
     } catch (err) {
-      console.log(err);
       throw new HttpException(
         'Error while writing file',
         HttpStatus.INTERNAL_SERVER_ERROR,

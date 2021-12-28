@@ -12,6 +12,8 @@ import { Favourite } from '../../favourite/entities/favourite.entity';
 import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
 import { MoviesService } from '../../movies/movies.service';
 import { Movie } from '../../movies/movie.entity';
+import { FilesService } from '../../files/files.service';
+import { FilesModule } from '../../files/files.module';
 
 describe('UsersService', () => {
   let userService: UsersService;
@@ -40,6 +42,7 @@ describe('UsersService', () => {
         ConfigModule.forRoot({
           envFilePath: `.${process.env.NODE_ENV}.env`,
         }),
+        FilesModule,
       ],
       providers: [
         UsersService,
@@ -76,7 +79,7 @@ describe('UsersService', () => {
     favouriteRepository = getRepository(Favourite, connectionName);
     favouriteItemRepository = getRepository(FavouriteItem, connectionName);
     movieRepository = getRepository(Movie, connectionName);
-    movieService = new MoviesService(movieRepository);
+    movieService = new MoviesService(movieRepository, new FilesService());
     favouriteService = new FavouriteService(
       favouriteRepository,
       favouriteItemRepository,

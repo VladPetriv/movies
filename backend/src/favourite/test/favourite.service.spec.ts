@@ -8,6 +8,8 @@ import { FavouriteItem } from '../entities/favourite-item.entity';
 import { TestHelper } from '../../util/test-helper';
 import { Movie } from '../../movies/movie.entity';
 import { MoviesService } from '../../movies/movies.service';
+import { FilesModule } from '../../files/files.module';
+import { FilesService } from '../../files/files.service';
 
 describe('FavouriteService', () => {
   let service: FavouriteService;
@@ -29,6 +31,7 @@ describe('FavouriteService', () => {
         ConfigModule.forRoot({
           envFilePath: `.${process.env.NODE_ENV}.env`,
         }),
+        FilesModule,
       ],
       providers: [
         FavouriteService,
@@ -52,7 +55,7 @@ describe('FavouriteService', () => {
     favouriteRepository = getRepository(Favourite, connectionName);
     favouriteItemRepository = getRepository(FavouriteItem, connectionName);
     movieRepository = getRepository(Movie, connectionName);
-    movieService = new MoviesService(movieRepository);
+    movieService = new MoviesService(movieRepository, new FilesService());
     service = new FavouriteService(
       favouriteRepository,
       favouriteItemRepository,
@@ -98,6 +101,7 @@ describe('FavouriteService', () => {
         year: 2020,
         country: 'USA',
         budget: '200000$',
+        poster: 'test.jpg',
       });
       favourite = await service.create();
       favouriteItemId = await service.createFavouriteItem({

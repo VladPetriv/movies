@@ -14,6 +14,8 @@ import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
 import { FavouriteService } from '../../favourite/favourite.service';
 import { MoviesService } from '../../movies/movies.service';
 import { Movie } from '../../movies/movie.entity';
+import { FilesModule } from '../../files/files.module';
+import { FilesService } from '../../files/files.service';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -48,6 +50,7 @@ describe('AuthService', () => {
             expiresIn: '5m',
           },
         }),
+        FilesModule,
       ],
       providers: [
         AuthService,
@@ -86,7 +89,7 @@ describe('AuthService', () => {
     favouriteRepository = getRepository(Favourite, connectionName);
     favouriteItemsRepository = getRepository(FavouriteItem, connectionName);
     movieRepository = getRepository(Movie, connectionName);
-    movieService = new MoviesService(movieRepository);
+    movieService = new MoviesService(movieRepository, new FilesService());
     favouriteService = new FavouriteService(
       favouriteRepository,
       favouriteItemsRepository,
