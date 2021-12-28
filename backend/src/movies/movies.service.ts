@@ -3,12 +3,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Movie } from './movie.entity';
 import { Repository } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
+import { FilesService } from 'src/files/files.service';
 
 @Injectable()
 export class MoviesService {
   constructor(
     @InjectRepository(Movie)
     private readonly movieRepository: Repository<Movie>,
+    private readonly fileService: FilesService,
   ) {}
 
   async getAllMovies(): Promise<Movie[]> {
@@ -28,7 +30,8 @@ export class MoviesService {
     if (candidate) {
       throw new HttpException('Movie is exist', HttpStatus.BAD_REQUEST);
     }
-    const movie = await this.movieRepository.create(dto);
+    const poster = await this.fileService.createFile(dto.poster);
+    const movie = await this.movieRepository.create({ ...dto, poster });
     await this.movieRepository.save(movie);
     return movie;
   }

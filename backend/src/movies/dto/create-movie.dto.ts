@@ -4,6 +4,9 @@ export class CreateMovieDto {
   @ApiProperty({ example: 'Terminator', description: 'Movie title' })
   title: string;
 
+  @ApiProperty({ example: 'image.jpg', description: 'Movie poster' })
+  poster: string;
+
   @ApiProperty({
     example: 'This movie is about...',
     description: 'Movie description',

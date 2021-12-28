@@ -5,8 +5,11 @@ import {
   Get,
   Param,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MoviesService } from './movies.service';
 import { Movie } from './movie.entity';
@@ -38,9 +41,13 @@ export class MoviesController {
   @ApiResponse({ status: 201, type: Movie })
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
+  @UseInterceptors(FileInterceptor('poster'))
   @Post('/create')
-  createMovie(@Body() createMovieDto: CreateMovieDto) {
-    return this.movieService.createMovie(createMovieDto);
+  createMovie(
+    @Body() createMovieDto: CreateMovieDto,
+    @UploadedFile() poster: string,
+  ) {
+    return this.movieService.createMovie({ ...createMovieDto, poster });
   }
 
   @ApiOperation({ summary: 'Delete movie' })
