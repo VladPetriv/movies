@@ -4,7 +4,7 @@ import { MoviesService } from './movies.service';
 import { MoviesController } from './movies.controller';
 import { Movie } from './movie.entity';
 import { AuthModule } from '../auth/auth.module';
-import { FilesModule } from 'src/files/files.module';
+import { FilesModule } from '../files/files.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Movie]), AuthModule, FilesModule],

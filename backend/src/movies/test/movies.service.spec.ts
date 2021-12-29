@@ -44,12 +44,14 @@ describe('MoviesService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
+
   it('should return all movie', async () => {
     const movies = await service.getAllMovies();
 
     expect(movies).toBeDefined();
     expect(movies).toStrictEqual([]);
   });
+
   describe('Get one movie tests', () => {
     let movieId: Movie;
     beforeAll(async () => {
@@ -81,19 +83,37 @@ describe('MoviesService', () => {
       }
     });
   });
-  it('should create movie', async () => {
-    const movie = await service.createMovie({
-      title: 'test.',
-      description: 'test.',
-      budget: '2000$',
-      year: 2020,
-      country: 'USA',
-      poster: 'test.jpg',
+
+  describe('Create movie tests', () => {
+    it('should create movie', async () => {
+      const movie = await service.createMovie({
+        title: 'test.',
+        description: 'test.',
+        budget: '2000$',
+        year: 2020,
+        country: 'USA',
+        poster: 'test.jpg',
+      });
+      expect(movie).toBeDefined();
+      expect(movie.title).toBe('test.');
+      expect(movie.description).toBe('test.');
+      expect(movie.budget).toBe('2000$');
     });
-    expect(movie).toBeDefined();
-    expect(movie.title).toBe('test.');
-    expect(movie.description).toBe('test.');
-    expect(movie.budget).toBe('2000$');
+    it('should throw an error that movie is exist', async () => {
+      try {
+        await service.createMovie({
+          title: 'test.',
+          description: 'test.',
+          budget: '2000$',
+          year: 2020,
+          country: 'USA',
+          poster: 'test.jpg',
+        });
+      } catch (err) {
+        expect(err.message).toBe('Movie is exist');
+        expect(err).toBeInstanceOf(HttpException);
+      }
+    });
   });
   describe('Delete movie test', () => {
     let movieId;
@@ -110,6 +130,14 @@ describe('MoviesService', () => {
     it('should delete movie', async () => {
       const movie = await service.deleteMovie(movieId.id);
       expect(movie).toBe('Movie was deleted');
+    });
+    it('should throw an error that movie not found', async () => {
+      try {
+        await service.deleteMovie(movieId.id + 1);
+      } catch (err) {
+        expect(err).toBeInstanceOf(HttpException);
+        expect(err.message).toBe('Movie not found');
+      }
     });
   });
 });

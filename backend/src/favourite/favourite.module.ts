@@ -5,7 +5,7 @@ import { Favourite } from './entities/favourite.entity';
 import { FavouriteItem } from './entities/favourite-item.entity';
 import { FavouriteController } from './favourite.controller';
 import { AuthModule } from '../auth/auth.module';
-import { MoviesModule } from 'src/movies/movies.module';
+import { MoviesModule } from '../movies/movies.module';
 
 @Module({
   imports: [
