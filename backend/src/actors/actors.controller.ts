@@ -10,7 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RoleGuard } from '../auth/roles.guard';
@@ -18,6 +18,7 @@ import { Actor } from './actor.entity';
 import { ActorsService } from './actors.service';
 import { CreateActorDto } from './dto/create-actor.dto';
 
+@ApiTags('Actor contoller')
 @Controller('actors')
 export class ActorsController {
   constructor(private readonly actorService: ActorsService) {}

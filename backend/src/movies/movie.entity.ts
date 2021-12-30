@@ -7,11 +7,11 @@ export class Movie {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ApiProperty({example:'image.jpg',description:'Movie poster'})
+  @ApiProperty({ example: 'image.jpg', description: 'Movie poster' })
   @Column({
-    nullable:false
+    nullable: false,
   })
-  poster:string
+  poster: string;
 
   @ApiProperty({ example: 'Terminator', description: 'Movie title' })
   @Column({
