@@ -12,7 +12,8 @@ import { FavouriteItem } from './favourite/entities/favourite-item.entity';
 import { MoviesModule } from './movies/movies.module';
 import { Movie } from './movies/movie.entity';
 import { FilesModule } from './files/files.module';
-
+import { ActorsModule } from './actors/actors.module';
+import { Actor } from './actors/actor.entity';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -25,7 +26,7 @@ import { FilesModule } from './files/files.module';
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
-      entities: [User, Role, Favourite, FavouriteItem, Movie],
+      entities: [User, Role, Favourite, FavouriteItem, Movie, Actor],
       synchronize: true,
     }),
     UsersModule,
@@ -34,6 +35,7 @@ import { FilesModule } from './files/files.module';
     FavouriteModule,
     MoviesModule,
     FilesModule,
+    ActorsModule,
   ],
 })
 export class AppModule {}
