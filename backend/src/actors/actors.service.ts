@@ -29,7 +29,7 @@ export class ActorsService {
       where: { name: dto.name },
     });
     if (candidate) {
-      throw new HttpException('Actor is exits', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Actor is exist', HttpStatus.BAD_REQUEST);
     }
     const actor = await this.actorRepository.create({
       ...dto,
