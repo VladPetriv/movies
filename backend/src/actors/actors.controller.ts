@@ -4,10 +4,10 @@ import {
   Post,
   Delete,
   Param,
-  UseGuards,
   UseInterceptors,
   UploadedFile,
   Body,
+  UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -25,14 +25,14 @@ export class ActorsController {
   @ApiOperation({ summary: 'Get all actors' })
   @ApiResponse({ status: 200, type: [Actor] })
   @Get('')
-  getAllMovies(): Promise<Actor[]> {
+  getAllActors(): Promise<Actor[]> {
     return this.actorService.getAll();
   }
 
   @ApiOperation({ summary: 'Get one actor by id' })
   @ApiResponse({ status: 200, type: Actor })
   @Get('/:actor_id')
-  getOneMovie(@Param('actor_id') actor_id: string): Promise<Actor> {
+  getOneActor(@Param('actor_id') actor_id: string): Promise<Actor> {
     return this.actorService.getOneById(Number(actor_id));
   }
 
@@ -42,7 +42,7 @@ export class ActorsController {
   @UseGuards(AuthGuard, RoleGuard)
   @UseInterceptors(FileInterceptor('image'))
   @Post('/create')
-  createMovie(
+  createActor(
     @Body() createActorDto: CreateActorDto,
     @UploadedFile() image: string,
   ): Promise<Actor> {
@@ -54,7 +54,7 @@ export class ActorsController {
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('/:movie_id')
-  deleteMovie(@Param('movie_id') movie_id: string): Promise<string> {
+  deleteActor(@Param('movie_id') movie_id: string): Promise<string> {
     return this.actorService.delete(Number(movie_id));
   }
 }
