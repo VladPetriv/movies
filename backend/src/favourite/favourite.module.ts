@@ -14,7 +14,7 @@ import { MoviesModule } from '../movies/movies.module';
     MoviesModule,
   ],
   providers: [FavouriteService],
-  exports: [FavouriteService],
   controllers: [FavouriteController],
+  exports: [FavouriteService],
 })
 export class FavouriteModule {}

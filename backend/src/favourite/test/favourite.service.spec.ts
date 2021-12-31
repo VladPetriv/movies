@@ -10,6 +10,7 @@ import { Movie } from '../../movies/movie.entity';
 import { MoviesService } from '../../movies/movies.service';
 import { FilesModule } from '../../files/files.module';
 import { FilesService } from '../../files/files.service';
+import { Actor } from '../../actors/actor.entity';
 
 describe('FavouriteService', () => {
   let service: FavouriteService;
@@ -23,6 +24,7 @@ describe('FavouriteService', () => {
     Favourite,
     FavouriteItem,
     Movie,
+    Actor,
   ]);
 
   beforeAll(async () => {
