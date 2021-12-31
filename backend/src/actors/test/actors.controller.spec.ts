@@ -5,6 +5,7 @@ import { ActorsController } from '../actors.controller';
 import { FilesModule } from '../../files/files.module';
 import { ActorsService } from '../actors.service';
 import { CreateActorDto } from '../dto/create-actor.dto';
+import { MoviesService } from '../../movies/movies.service';
 
 describe('ActorsController', () => {
   let controller: ActorsController;
@@ -13,6 +14,19 @@ describe('ActorsController', () => {
   };
   const mockRolesGuard = {
     canActivate: jest.fn(() => true),
+  };
+  const mockMovieService = {
+    getOneMovie: jest.fn((movie_id: number) => {
+      return {
+        id: movie_id,
+        title: 'test',
+        description: 'test.',
+        budget: '2000$',
+        year: 2020,
+        country: 'USA',
+        poster: 'test.jpg',
+      };
+    }),
   };
   const mockActorService = {
     getAll: jest.fn(() => []),
@@ -25,10 +39,11 @@ describe('ActorsController', () => {
         image: 'test.jpg',
       };
     }),
-    create: jest.fn((dto: CreateActorDto) => {
+    create: jest.fn((dto: CreateActorDto, movie_id: number) => {
       return {
         id: 23,
         ...dto,
+        movie: movie_id,
       };
     }),
   };
@@ -45,6 +60,8 @@ describe('ActorsController', () => {
       .useValue(mockAuthGuard)
       .overrideGuard(RoleGuard)
       .useValue(mockRolesGuard)
+      .overrideProvider(MoviesService)
+      .useValue(mockMovieService)
       .compile();
 
     controller = module.get<ActorsController>(ActorsController);
@@ -68,6 +85,7 @@ describe('ActorsController', () => {
   it('should create user', () => {
     expect(
       controller.createActor(
+        '1',
         {
           name: 'test',
           age: 20,
@@ -82,6 +100,7 @@ describe('ActorsController', () => {
       age: 20,
       description: 'test.',
       image: 'test.jpg',
+      movie: 1,
     });
   });
 });

@@ -18,7 +18,7 @@ import { Actor } from './actor.entity';
 import { ActorsService } from './actors.service';
 import { CreateActorDto } from './dto/create-actor.dto';
 
-@ApiTags('Actor contoller')
+@ApiTags('Actor controller')
 @Controller('actors')
 export class ActorsController {
   constructor(private readonly actorService: ActorsService) {}
@@ -42,12 +42,16 @@ export class ActorsController {
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
   @UseInterceptors(FileInterceptor('image'))
-  @Post('/create')
+  @Post('/:movie_id/create')
   createActor(
+    @Param('movie_id') movie_id: string,
     @Body() createActorDto: CreateActorDto,
     @UploadedFile() image: string,
   ): Promise<Actor> {
-    return this.actorService.create({ ...createActorDto, image });
+    return this.actorService.create(
+      { ...createActorDto, image },
+      Number(movie_id),
+    );
   }
 
   @ApiOperation({ summary: 'Delete actor' })

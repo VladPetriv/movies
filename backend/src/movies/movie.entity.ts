@@ -1,5 +1,6 @@
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Actor } from '../actors/actor.entity';
 
 @Entity()
 export class Movie {
@@ -48,4 +49,9 @@ export class Movie {
     nullable: false,
   })
   budget: string;
+
+  @OneToMany(() => Actor, (actor) => actor.movie, {
+    nullable: true,
+  })
+  actors: Actor[];
 }

@@ -8,13 +8,17 @@ import { ActorsService } from '../actors.service';
 import { FilesModule } from '../../files/files.module';
 import { FilesService } from '../../files/files.service';
 import { TestHelper } from '../../util/test-helper';
+import { Movie } from '../../movies/movie.entity';
+import { MoviesService } from '../../movies/movies.service';
 
 describe('ActorsService', () => {
   let service: ActorsService;
   let actorRepository: Repository<Actor>;
+  let movieService: MoviesService;
+  let movieRepository: Repository<Movie>;
 
   const connectionName = 'tests';
-  const testHelper = new TestHelper(connectionName, [Actor]);
+  const testHelper = new TestHelper(connectionName, [Actor, Movie]);
 
   beforeAll(async () => {
     await Test.createTestingModule({
@@ -30,11 +34,22 @@ describe('ActorsService', () => {
           provide: getRepositoryToken(Actor),
           useClass: Repository,
         },
+        MoviesService,
+        {
+          provide: getRepositoryToken(Movie),
+          useClass: Repository,
+        },
       ],
     }).compile();
     const connection = await testHelper.createTestConnection();
+    movieRepository = getRepository(Movie, connectionName);
+    movieService = new MoviesService(movieRepository, new FilesService());
     actorRepository = getRepository(Actor, connectionName);
-    service = new ActorsService(actorRepository, new FilesService());
+    service = new ActorsService(
+      actorRepository,
+      new FilesService(),
+      movieService,
+    );
     return connection;
   });
   afterAll(async () => {
@@ -51,13 +66,25 @@ describe('ActorsService', () => {
   });
   describe('Get one actor tests', () => {
     let actorId;
+    let movie;
     beforeAll(async () => {
-      actorId = await service.create({
-        name: 'test',
-        age: 20,
-        description: 'tests.',
-        image: 'test.jpg',
+      movie = await movieService.createMovie({
+        title: 'test',
+        description: 'test.',
+        budget: '2000$',
+        year: 2020,
+        country: 'USA',
+        poster: 'test.jpg',
       });
+      actorId = await service.create(
+        {
+          name: 'test',
+          age: 20,
+          description: 'tests.',
+          image: 'test.jpg',
+        },
+        movie.id,
+      );
     });
     it('should return actor by id', async () => {
       const actor = await service.getOneById(actorId.id);
@@ -71,20 +98,50 @@ describe('ActorsService', () => {
       try {
         await service.getOneById(actorId.id + 1);
       } catch (err) {
-        console.log(err);
         expect(err).toBeInstanceOf(HttpException);
         expect(err.message).toBe('Actor not found');
       }
     });
   });
   describe('Create actor tests', () => {
-    it('should create an actor', async () => {
-      const actor = await service.create({
-        name: 'tests',
-        age: 20,
-        description: 'tests.',
-        image: 'image.jpg',
+    let movie;
+    beforeAll(async () => {
+      movie = await movieService.createMovie({
+        title: 'test_',
+        description: 'test.',
+        budget: '2000$',
+        year: 2020,
+        country: 'USA',
+        poster: 'test.jpg',
       });
+    });
+    it('should throw an error that movie not found', async () => {
+      try {
+        await service.create(
+          {
+            name: 'tests',
+            age: 20,
+            description: 'tests.',
+            image: 'image.jpg',
+          },
+          movie.id + 1,
+        );
+      } catch (err) {
+        expect(err).toBeInstanceOf(HttpException);
+        expect(err.message).toBe('Movie not found');
+      }
+    });
+
+    it('should create an actor', async () => {
+      const actor = await service.create(
+        {
+          name: 'tests',
+          age: 20,
+          description: 'tests.',
+          image: 'image.jpg',
+        },
+        movie.id,
+      );
       expect(actor).toBeDefined();
       expect(actor.name).toBe('tests');
       expect(actor.age).toBe(20);
@@ -92,12 +149,15 @@ describe('ActorsService', () => {
     });
     it('should throw an error that actor is exist', async () => {
       try {
-        await service.create({
-          name: 'test',
-          age: 20,
-          description: 'tests.',
-          image: 'image.jpg',
-        });
+        await service.create(
+          {
+            name: 'test__',
+            age: 20,
+            description: 'tests.',
+            image: 'image.jpg',
+          },
+          movie.id,
+        );
       } catch (err) {
         expect(err).toBeInstanceOf(HttpException);
         expect(err.message).toBe('Actor is exist');
@@ -106,13 +166,25 @@ describe('ActorsService', () => {
   });
   describe('Delete actor tests', () => {
     let actorId;
+    let movie;
     beforeAll(async () => {
-      actorId = await service.create({
-        name: 'deleted',
-        age: 20,
-        description: 'tests.',
-        image: 'image.jpg',
+      movie = await movieService.createMovie({
+        title: 'testf',
+        description: 'test.',
+        budget: '2000$',
+        year: 2020,
+        country: 'USA',
+        poster: 'test.jpg',
       });
+      actorId = await service.create(
+        {
+          name: 'deleted',
+          age: 20,
+          description: 'tests.',
+          image: 'image.jpg',
+        },
+        movie.id,
+      );
     });
     it('should delete actor ', async () => {
       const actor = await service.delete(actorId.id);

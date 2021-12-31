@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Actor } from './actor.entity';
 import { CreateActorDto } from './dto/create-actor.dto';
 import { FilesService } from '../files/files.service';
+import { MoviesService } from '../movies/movies.service';
 
 @Injectable()
 export class ActorsService {
@@ -11,6 +12,7 @@ export class ActorsService {
     @InjectRepository(Actor)
     private readonly actorRepository: Repository<Actor>,
     private readonly fileService: FilesService,
+    private readonly movieService: MoviesService,
   ) {}
 
   async getAll(): Promise<Actor[]> {
@@ -23,17 +25,22 @@ export class ActorsService {
     }
     return actor;
   }
-  async create(dto: CreateActorDto): Promise<Actor> {
+  async create(dto: CreateActorDto, movie_id: number): Promise<Actor> {
     const fileName = await this.fileService.createFile(dto.image);
     const candidate = await this.actorRepository.findOne({
       where: { name: dto.name },
     });
+    const movie = await this.movieService.getOneMovie(movie_id);
     if (candidate) {
       throw new HttpException('Actor is exist', HttpStatus.BAD_REQUEST);
+    }
+    if (!movie) {
+      throw new HttpException('Movie not found', HttpStatus.NOT_FOUND);
     }
     const actor = await this.actorRepository.create({
       ...dto,
       image: fileName,
+      movie: movie,
     });
     await this.actorRepository.save(actor);
     return actor;

@@ -1,5 +1,6 @@
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Movie } from '../movies/movie.entity';
 
 @Entity()
 export class Actor {
@@ -34,4 +35,7 @@ export class Actor {
     nullable: false,
   })
   image: string;
+
+  @ManyToOne(() => Movie, (movie) => movie.actors)
+  movie: Movie;
 }
