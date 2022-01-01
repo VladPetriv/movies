@@ -48,7 +48,7 @@ export class GenresController {
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('/:genre_id')
-  deleteActor(@Param('genre_id') genre_id: string): Promise<string> {
+  deleteGenre(@Param('genre_id') genre_id: string): Promise<string> {
     return this.genreService.delete(Number(genre_id));
   }
 }
