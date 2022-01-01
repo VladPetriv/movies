@@ -58,8 +58,8 @@ export class ActorsController {
   @ApiResponse({ status: 200 })
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
-  @Delete('/:movie_id')
-  deleteActor(@Param('movie_id') movie_id: string): Promise<string> {
-    return this.actorService.delete(Number(movie_id));
+  @Delete('/:actor_id')
+  deleteActor(@Param('actor_id') actor_id: string): Promise<string> {
+    return this.actorService.delete(Number(actor_id));
   }
 }

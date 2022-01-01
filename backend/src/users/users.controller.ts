@@ -9,7 +9,7 @@ import { User } from './user.entity';
 import { UsersService } from './users.service';
 import { AddRoleDto } from './dto/add-role.dto';
 
-@ApiTags('Users')
+@ApiTags('Users controller')
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
