@@ -18,7 +18,7 @@ import { FilesModule } from '../../files/files.module';
 import { FilesService } from '../../files/files.service';
 import { Actor } from '../../actors/actor.entity';
 import { Genre } from '../../genres/genre.entity';
-
+import { GenresService } from '../../genres/genres.service';
 describe('AuthService', () => {
   let service: AuthService;
   let userService: UsersService;
@@ -30,6 +30,8 @@ describe('AuthService', () => {
   let favouriteService: FavouriteService;
   let movieRepository: Repository<Movie>;
   let movieService: MoviesService;
+  let genreRepository: Repository<Genre>;
+  let genreService: GenresService;
 
   const connectionName = 'tests';
   const testHelper = new TestHelper(connectionName, [
@@ -82,18 +84,29 @@ describe('AuthService', () => {
           provide: getRepositoryToken(Movie),
           useClass: Repository,
         },
+        GenresService,
+        {
+          provide: getRepositoryToken(Genre),
+          useClass: Repository,
+        },
       ],
     }).compile();
 
     const connection = await testHelper.createTestConnection();
 
+    genreRepository = getRepository(Genre, connectionName);
+    genreService = new GenresService(genreRepository);
     roleRepository = getRepository(Role, connectionName);
     roleService = new RolesService(roleRepository);
     userRepository = getRepository(User, connectionName);
     favouriteRepository = getRepository(Favourite, connectionName);
     favouriteItemsRepository = getRepository(FavouriteItem, connectionName);
     movieRepository = getRepository(Movie, connectionName);
-    movieService = new MoviesService(movieRepository, new FilesService());
+    movieService = new MoviesService(
+      movieRepository,
+      new FilesService(),
+      genreService,
+    );
     favouriteService = new FavouriteService(
       favouriteRepository,
       favouriteItemsRepository,

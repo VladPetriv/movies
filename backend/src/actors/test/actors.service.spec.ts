@@ -11,12 +11,15 @@ import { TestHelper } from '../../util/test-helper';
 import { Movie } from '../../movies/movie.entity';
 import { MoviesService } from '../../movies/movies.service';
 import { Genre } from '../../genres/genre.entity';
+import { GenresService } from '../../genres/genres.service';
 
 describe('ActorsService', () => {
   let service: ActorsService;
   let actorRepository: Repository<Actor>;
   let movieService: MoviesService;
   let movieRepository: Repository<Movie>;
+  let genreService: GenresService;
+  let genreRepository: Repository<Genre>;
 
   const connectionName = 'tests';
   const testHelper = new TestHelper(connectionName, [Actor, Movie, Genre]);
@@ -40,11 +43,23 @@ describe('ActorsService', () => {
           provide: getRepositoryToken(Movie),
           useClass: Repository,
         },
+        GenresService,
+        {
+          provide: getRepositoryToken(Genre),
+          useClass: Repository,
+        },
       ],
     }).compile();
     const connection = await testHelper.createTestConnection();
+
+    genreRepository = getRepository(Genre, connectionName);
+    genreService = new GenresService(genreRepository);
     movieRepository = getRepository(Movie, connectionName);
-    movieService = new MoviesService(movieRepository, new FilesService());
+    movieService = new MoviesService(
+      movieRepository,
+      new FilesService(),
+      genreService,
+    );
     actorRepository = getRepository(Actor, connectionName);
     service = new ActorsService(
       actorRepository,
@@ -68,7 +83,12 @@ describe('ActorsService', () => {
   describe('Get one actor tests', () => {
     let actorId;
     let movie;
+    let genre;
     beforeAll(async () => {
+      genre = await genreService.create({
+        name: 'test',
+        description: 'test',
+      });
       movie = await movieService.createMovie({
         title: 'test',
         description: 'test.',
@@ -76,6 +96,7 @@ describe('ActorsService', () => {
         year: 2020,
         country: 'USA',
         poster: 'test.jpg',
+        genre_name: genre.name,
       });
       actorId = await service.create(
         {
@@ -106,7 +127,12 @@ describe('ActorsService', () => {
   });
   describe('Create actor tests', () => {
     let movie;
+    let genre;
     beforeAll(async () => {
+      genre = await genreService.create({
+        name: 'test2',
+        description: 'test',
+      });
       movie = await movieService.createMovie({
         title: 'test_',
         description: 'test.',
@@ -114,6 +140,7 @@ describe('ActorsService', () => {
         year: 2020,
         country: 'USA',
         poster: 'test.jpg',
+        genre_name: genre.name,
       });
     });
     it('should throw an error that movie not found', async () => {
@@ -168,7 +195,12 @@ describe('ActorsService', () => {
   describe('Delete actor tests', () => {
     let actorId;
     let movie;
+    let genre;
     beforeAll(async () => {
+      genre = await genreService.create({
+        name: 'test3',
+        description: 'test',
+      });
       movie = await movieService.createMovie({
         title: 'testf',
         description: 'test.',
@@ -176,6 +208,7 @@ describe('ActorsService', () => {
         year: 2020,
         country: 'USA',
         poster: 'test.jpg',
+        genre_name: genre.name,
       });
       actorId = await service.create(
         {

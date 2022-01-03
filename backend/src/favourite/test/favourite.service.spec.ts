@@ -12,6 +12,7 @@ import { FilesModule } from '../../files/files.module';
 import { FilesService } from '../../files/files.service';
 import { Actor } from '../../actors/actor.entity';
 import { Genre } from '../../genres/genre.entity';
+import { GenresService } from '../../genres/genres.service';
 
 describe('FavouriteService', () => {
   let service: FavouriteService;
@@ -19,6 +20,8 @@ describe('FavouriteService', () => {
   let favouriteItemRepository: Repository<FavouriteItem>;
   let movieRepository: Repository<Movie>;
   let movieService: MoviesService;
+  let genreRepository: Repository<Genre>;
+  let genreService: GenresService;
 
   const connectionName = 'tests';
   const testHelper = new TestHelper(connectionName, [
@@ -52,14 +55,25 @@ describe('FavouriteService', () => {
           provide: getRepositoryToken(Movie),
           useClass: Repository,
         },
+        GenresService,
+        {
+          provide: getRepositoryToken(Genre),
+          useClass: Repository,
+        },
       ],
     }).compile();
     const connection = await testHelper.createTestConnection();
 
+    genreRepository = getRepository(Genre, connectionName);
+    genreService = new GenresService(genreRepository);
     favouriteRepository = getRepository(Favourite, connectionName);
     favouriteItemRepository = getRepository(FavouriteItem, connectionName);
     movieRepository = getRepository(Movie, connectionName);
-    movieService = new MoviesService(movieRepository, new FilesService());
+    movieService = new MoviesService(
+      movieRepository,
+      new FilesService(),
+      genreService,
+    );
     service = new FavouriteService(
       favouriteRepository,
       favouriteItemRepository,
@@ -98,7 +112,12 @@ describe('FavouriteService', () => {
     let favourite;
     let favouriteItemId;
     let movie;
+    let genre;
     beforeEach(async () => {
+      genre = await genreService.create({
+        name: 'test1',
+        description: 'test',
+      });
       movie = await movieService.createMovie({
         title: 'test',
         description: 'test',
@@ -106,6 +125,7 @@ describe('FavouriteService', () => {
         country: 'USA',
         budget: '200000$',
         poster: 'test.jpg',
+        genre_name: genre.name,
       });
       favourite = await service.create();
       favouriteItemId = await service.createFavouriteItem({

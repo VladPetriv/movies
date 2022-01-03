@@ -10,10 +10,14 @@ import { FilesModule } from '../../files/files.module';
 import { FilesService } from '../../files/files.service';
 import { Actor } from '../../actors/actor.entity';
 import { Genre } from '../../genres/genre.entity';
+import { GenresService } from '../../genres/genres.service';
+import { GenresModule } from '../../genres/genres.module';
 
 describe('MoviesService', () => {
   let service: MoviesService;
   let movieRepository: Repository<Movie>;
+  let genreRepository: Repository<Genre>;
+  let genreService: GenresService;
   const connectionName = 'tests';
   const testHelper = new TestHelper(connectionName, [Movie, Actor, Genre]);
 
@@ -24,6 +28,7 @@ describe('MoviesService', () => {
           envFilePath: `.${process.env.NODE_ENV}.env`,
         }),
         FilesModule,
+        GenresModule,
       ],
       providers: [
         MoviesService,
@@ -31,12 +36,22 @@ describe('MoviesService', () => {
           provide: getRepositoryToken(Movie),
           useClass: Repository,
         },
+        {
+          provide: getRepositoryToken(Genre),
+          useClass: Repository,
+        },
       ],
     }).compile();
     const connection = await testHelper.createTestConnection();
 
+    genreRepository = getRepository(Genre, connectionName);
     movieRepository = getRepository(Movie, connectionName);
-    service = new MoviesService(movieRepository, new FilesService());
+    genreService = new GenresService(genreRepository);
+    service = new MoviesService(
+      movieRepository,
+      new FilesService(),
+      genreService,
+    );
     return connection;
   });
   afterAll(async () => {
@@ -56,7 +71,12 @@ describe('MoviesService', () => {
 
   describe('Get one movie tests', () => {
     let movieId: Movie;
+    let genre: Genre;
     beforeAll(async () => {
+      genre = await genreService.create({
+        name: 'test',
+        description: 'test',
+      });
       movieId = await service.createMovie({
         title: 'test',
         description: 'test.',
@@ -64,8 +84,10 @@ describe('MoviesService', () => {
         year: 2020,
         country: 'USA',
         poster: 'test.jpg',
+        genre_name: genre.name,
       });
     });
+
     it('should return movie by id', async () => {
       const movie = await service.getOneMovie(movieId.id);
       expect(movie).toBeDefined();
@@ -87,6 +109,14 @@ describe('MoviesService', () => {
   });
 
   describe('Create movie tests', () => {
+    let genre: Genre;
+    beforeAll(async () => {
+      genre = await genreService.create({
+        name: 'test',
+        description: 'test',
+      });
+    });
+
     it('should create movie', async () => {
       const movie = await service.createMovie({
         title: 'test.',
@@ -95,6 +125,7 @@ describe('MoviesService', () => {
         year: 2020,
         country: 'USA',
         poster: 'test.jpg',
+        genre_name: genre.name,
       });
       expect(movie).toBeDefined();
       expect(movie.title).toBe('test.');
@@ -110,6 +141,7 @@ describe('MoviesService', () => {
           year: 2020,
           country: 'USA',
           poster: 'test.jpg',
+          genre_name: genre.name,
         });
       } catch (err) {
         expect(err.message).toBe('Movie is exist');
@@ -119,7 +151,12 @@ describe('MoviesService', () => {
   });
   describe('Delete movie test', () => {
     let movieId;
+    let genre;
     beforeAll(async () => {
+      genre = await genreService.create({
+        name: 'test',
+        description: 'test',
+      });
       movieId = await service.createMovie({
         title: 'test..',
         description: 'test.',
@@ -127,6 +164,7 @@ describe('MoviesService', () => {
         year: 2020,
         country: 'USA',
         poster: 'test.jpg',
+        genre_name: genre.name,
       });
     });
     it('should delete movie', async () => {
