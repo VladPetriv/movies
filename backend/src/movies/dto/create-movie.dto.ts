@@ -24,4 +24,7 @@ export class CreateMovieDto {
 
   @ApiProperty({ example: '200000$', description: 'Budget for movie' })
   budget: string;
+
+  @ApiProperty({ example: 'horror', description: 'Genre name' })
+  genre_name: string;
 }

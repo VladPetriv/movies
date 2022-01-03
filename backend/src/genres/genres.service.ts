@@ -22,6 +22,15 @@ export class GenresService {
     }
     return genre;
   }
+  async getOneByName(genre_name: string): Promise<Genre> {
+    const genre = await this.genreRepository.findOne({
+      where: { name: genre_name },
+    });
+    if (!genre) {
+      throw new HttpException('Genre not found', HttpStatus.NOT_FOUND);
+    }
+    return genre;
+  }
   async create(dto: CreateGenreDto): Promise<Genre> {
     const candidate = await this.genreRepository.findOne({
       where: { name: dto.name },
