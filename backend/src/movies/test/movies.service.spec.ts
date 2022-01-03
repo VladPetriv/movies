@@ -9,12 +9,13 @@ import { TestHelper } from '../../util/test-helper';
 import { FilesModule } from '../../files/files.module';
 import { FilesService } from '../../files/files.service';
 import { Actor } from '../../actors/actor.entity';
+import { Genre } from '../../genres/genre.entity';
 
 describe('MoviesService', () => {
   let service: MoviesService;
   let movieRepository: Repository<Movie>;
   const connectionName = 'tests';
-  const testHelper = new TestHelper(connectionName, [Movie, Actor]);
+  const testHelper = new TestHelper(connectionName, [Movie, Actor, Genre]);
 
   beforeAll(async () => {
     await Test.createTestingModule({

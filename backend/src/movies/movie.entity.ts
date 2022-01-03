@@ -1,7 +1,14 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Actor } from '../actors/actor.entity';
-
+import { Genre } from '../genres/genre.entity';
 @Entity()
 export class Movie {
   @ApiProperty({ example: '1', description: 'Unique movie id' })
@@ -54,4 +61,8 @@ export class Movie {
     nullable: true,
   })
   actors: Actor[];
+
+  @OneToOne(() => Genre)
+  @JoinColumn()
+  genre: Genre;
 }

@@ -15,6 +15,7 @@ import { Movie } from '../../movies/movie.entity';
 import { FilesService } from '../../files/files.service';
 import { FilesModule } from '../../files/files.module';
 import { Actor } from '../../actors/actor.entity';
+import { Genre } from '../../genres/genre.entity';
 
 describe('UsersService', () => {
   let userService: UsersService;
@@ -36,6 +37,7 @@ describe('UsersService', () => {
     FavouriteItem,
     Movie,
     Actor,
+    Genre,
   ]);
 
   beforeAll(async () => {

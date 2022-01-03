@@ -10,6 +10,7 @@ import { FilesService } from '../../files/files.service';
 import { TestHelper } from '../../util/test-helper';
 import { Movie } from '../../movies/movie.entity';
 import { MoviesService } from '../../movies/movies.service';
+import { Genre } from '../../genres/genre.entity';
 
 describe('ActorsService', () => {
   let service: ActorsService;
@@ -18,7 +19,7 @@ describe('ActorsService', () => {
   let movieRepository: Repository<Movie>;
 
   const connectionName = 'tests';
-  const testHelper = new TestHelper(connectionName, [Actor, Movie]);
+  const testHelper = new TestHelper(connectionName, [Actor, Movie, Genre]);
 
   beforeAll(async () => {
     await Test.createTestingModule({

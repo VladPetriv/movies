@@ -17,6 +17,7 @@ import { Movie } from '../../movies/movie.entity';
 import { FilesModule } from '../../files/files.module';
 import { FilesService } from '../../files/files.service';
 import { Actor } from '../../actors/actor.entity';
+import { Genre } from '../../genres/genre.entity';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -38,6 +39,7 @@ describe('AuthService', () => {
     FavouriteItem,
     Movie,
     Actor,
+    Genre,
   ]);
 
   beforeEach(async () => {
