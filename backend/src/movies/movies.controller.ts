@@ -17,7 +17,6 @@ import { Roles } from '../auth/roles.decorator';
 import { AuthGuard } from '../auth/auth.guard';
 import { RoleGuard } from '../auth/roles.guard';
 import { CreateMovieDto } from './dto/create-movie.dto';
-import { AuthModule } from '../auth/auth.module';
 
 @ApiTags('Movie controller')
 @Controller('movies')
@@ -53,7 +52,7 @@ export class MoviesController {
   @ApiOperation({ summary: 'Delete movie' })
   @ApiResponse({ status: 200 })
   @Roles('ADMIN')
-  @UseGuards(AuthModule, RoleGuard)
+  @UseGuards(AuthGuard, RoleGuard)
   @Delete('/:movie_id')
   deleteMovie(@Param('movie_id') movie_id: string): Promise<string> {
     return this.movieService.deleteMovie(Number(movie_id));

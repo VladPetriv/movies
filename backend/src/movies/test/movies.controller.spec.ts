@@ -6,6 +6,7 @@ import { FilesService } from '../../files/files.service';
 import { CreateMovieDto } from '../dto/create-movie.dto';
 import { MoviesController } from '../movies.controller';
 import { MoviesService } from '../movies.service';
+import { GenresService } from '../../genres/genres.service';
 
 describe('MoviesController', () => {
   let controller: MoviesController;
@@ -45,6 +46,16 @@ describe('MoviesController', () => {
     }),
   };
 
+  const mockGenreService = {
+    getOneByName:jest.fn((name:string)=>{
+      return {
+        id:1,
+        name,
+        description:'test'
+      }
+    })
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [FilesModule],
@@ -59,6 +70,8 @@ describe('MoviesController', () => {
       .useValue(mockMovieService)
       .overrideProvider(FilesService)
       .useValue(mockFileService)
+      .overrideProvider(GenresService)
+      .useValue(mockGenreService)
       .compile();
 
     controller = module.get<MoviesController>(MoviesController);
@@ -77,6 +90,7 @@ describe('MoviesController', () => {
           year: 2020,
           country: 'USA',
           poster: 'test.jpg',
+          genre_name:'name'
         },
         'test.jpg',
       ),
@@ -88,6 +102,7 @@ describe('MoviesController', () => {
       year: 2020,
       country: 'USA',
       poster: 'test.jpg',
+      genre_name:'name'
     });
   });
   it('should return all movies', () => {

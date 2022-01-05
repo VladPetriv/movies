@@ -11,13 +11,13 @@ import { FilesService } from '../../files/files.service';
 import { Actor } from '../../actors/actor.entity';
 import { Genre } from '../../genres/genre.entity';
 import { GenresService } from '../../genres/genres.service';
-import { GenresModule } from '../../genres/genres.module';
 
 describe('MoviesService', () => {
   let service: MoviesService;
   let movieRepository: Repository<Movie>;
   let genreRepository: Repository<Genre>;
   let genreService: GenresService;
+
   const connectionName = 'tests';
   const testHelper = new TestHelper(connectionName, [Movie, Actor, Genre]);
 
@@ -28,7 +28,6 @@ describe('MoviesService', () => {
           envFilePath: `.${process.env.NODE_ENV}.env`,
         }),
         FilesModule,
-        GenresModule,
       ],
       providers: [
         MoviesService,
@@ -36,12 +35,14 @@ describe('MoviesService', () => {
           provide: getRepositoryToken(Movie),
           useClass: Repository,
         },
+        GenresService,
         {
           provide: getRepositoryToken(Genre),
           useClass: Repository,
         },
       ],
     }).compile();
+
     const connection = await testHelper.createTestConnection();
 
     genreRepository = getRepository(Genre, connectionName);
@@ -54,6 +55,7 @@ describe('MoviesService', () => {
     );
     return connection;
   });
+
   afterAll(async () => {
     await getConnection(connectionName).close();
   });
@@ -74,9 +76,10 @@ describe('MoviesService', () => {
     let genre: Genre;
     beforeAll(async () => {
       genre = await genreService.create({
-        name: 'test',
+        name: 'test1',
         description: 'test',
       });
+
       movieId = await service.createMovie({
         title: 'test',
         description: 'test.',
@@ -98,6 +101,7 @@ describe('MoviesService', () => {
       expect(movie.year).toBe(2020);
       expect(movie.budget).toBe('2000$');
     });
+
     it('should throw an error that movie is not exist', async () => {
       try {
         await service.getOneMovie(movieId.id + 1);
@@ -112,7 +116,7 @@ describe('MoviesService', () => {
     let genre: Genre;
     beforeAll(async () => {
       genre = await genreService.create({
-        name: 'test',
+        name: 'test2',
         description: 'test',
       });
     });
@@ -132,6 +136,7 @@ describe('MoviesService', () => {
       expect(movie.description).toBe('test.');
       expect(movie.budget).toBe('2000$');
     });
+
     it('should throw an error that movie is exist', async () => {
       try {
         await service.createMovie({
@@ -149,12 +154,13 @@ describe('MoviesService', () => {
       }
     });
   });
+
   describe('Delete movie test', () => {
     let movieId;
     let genre;
     beforeAll(async () => {
       genre = await genreService.create({
-        name: 'test',
+        name: 'test3',
         description: 'test',
       });
       movieId = await service.createMovie({
