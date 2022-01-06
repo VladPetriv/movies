@@ -8,6 +8,8 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -19,6 +21,7 @@ import { RoleGuard } from '../auth/roles.guard';
 import { CreateMovieDto } from './dto/create-movie.dto';
 
 @ApiTags('Movie controller')
+@UsePipes(new ValidationPipe())
 @Controller('movies')
 export class MoviesController {
   constructor(private readonly movieService: MoviesService) {}

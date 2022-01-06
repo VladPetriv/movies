@@ -8,6 +8,8 @@ import {
   UploadedFile,
   Body,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -19,6 +21,7 @@ import { ActorsService } from './actors.service';
 import { CreateActorDto } from './dto/create-actor.dto';
 
 @ApiTags('Actor controller')
+@UsePipes(new ValidationPipe())
 @Controller('actors')
 export class ActorsController {
   constructor(private readonly actorService: ActorsService) {}

@@ -1,4 +1,13 @@
-import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  UseGuards,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -10,6 +19,7 @@ import { UsersService } from './users.service';
 import { AddRoleDto } from './dto/add-role.dto';
 
 @ApiTags('Users controller')
+@UsePipes(new ValidationPipe())
 @Controller('users')
 export class UsersController {
   constructor(private readonly userService: UsersService) {}
