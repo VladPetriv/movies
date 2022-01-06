@@ -18,6 +18,7 @@ export class ActorsService {
   async getAll(): Promise<Actor[]> {
     return await this.actorRepository.find();
   }
+
   async getOneById(actor_id: number): Promise<Actor> {
     const actor = await this.actorRepository.findOne(actor_id);
     if (!actor) {
@@ -25,6 +26,7 @@ export class ActorsService {
     }
     return actor;
   }
+
   async create(dto: CreateActorDto, movie_id: number): Promise<Actor> {
     const fileName = await this.fileService.createFile(dto.image);
     const candidate = await this.actorRepository.findOne({
@@ -45,6 +47,7 @@ export class ActorsService {
     await this.actorRepository.save(actor);
     return actor;
   }
+
   async delete(actor_id: number): Promise<string> {
     const actor = await this.actorRepository.findOne(actor_id);
     if (!actor) {
