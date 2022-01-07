@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
@@ -28,10 +28,12 @@ export class UsersService {
   }
 
   async getUserByEmail(email: string): Promise<User> {
-    return await this.userRepository.findOne({
+    const user = await this.userRepository.findOne({
       where: { email },
       relations: ['roles', 'favourite'],
     });
+    if (!user) return null;
+    return user;
   }
 
   async getAllUsers(): Promise<User[]> {
@@ -51,7 +53,7 @@ export class UsersService {
       await this.userRepository.save(user);
       return user;
     }
-    throw new HttpException('User or role not found', HttpStatus.NOT_FOUND);
+    return null;
   }
 
   async banUser(dto: BanUserDto): Promise<User> {
@@ -59,6 +61,8 @@ export class UsersService {
       where: { id: dto.userId },
       relations: ['roles', 'favourite'],
     });
+    if (!user) return null;
+
     user.ban = true;
     user.banReason = dto.reason;
     await this.userRepository.save(user);
@@ -67,9 +71,8 @@ export class UsersService {
 
   async deleteUser(email: string): Promise<string> {
     const user = await this.getUserByEmail(email);
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
+    if (!user) return null;
+
     await this.userRepository.delete({ id: user.id });
     return 'User was deleted';
   }

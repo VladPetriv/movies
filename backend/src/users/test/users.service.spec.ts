@@ -166,6 +166,10 @@ describe('UsersService', () => {
       expect(user.password).toBe(password);
       expect(user.ban).toBe(false);
     });
+    it('should return null', async () => {
+      const user = await userService.getUserByEmail('test@gsgsag.com');
+      expect(user).toBe(null);
+    });
   });
   describe('Ban user test', () => {
     const email = 'test1@test.com';
@@ -211,33 +215,31 @@ describe('UsersService', () => {
       expect(user['roles'].length).toBe(2);
       expect(user['roles'][1].value).toBe(newRoleValue);
     });
-    it('should throw an error that role not exist', async () => {
-      try {
-        await userService.addRole({
-          userId: createdUser.id,
-          value: '',
-        });
-      } catch (err) {
-        expect(err.message).toBe('User or role not found');
-      }
+    it('should return null', async () => {
+      const user = await userService.addRole({
+        userId: createdUser.id,
+        value: '',
+      });
+      expect(user).toBe(null);
     });
-    it('should throw an error that user not exist', async () => {
-      try {
-        await userService.addRole({
-          userId: 123,
-          value: 'ADMIN',
-        });
-      } catch (err) {
-        expect(err.message).toBe('User or role not found');
-      }
+    it('should return null', async () => {
+      const user = await userService.addRole({
+        userId: 123,
+        value: 'ADMIN',
+      });
+      expect(user).toBe(null);
     });
   });
   describe('Delete user test', () => {
     const email = 'test2@test.com';
-    it('should detele user', async () => {
+    it('should delete user', async () => {
       const user = await userService.deleteUser(email);
       expect(user).toBeDefined();
       expect(user).toBe('User was deleted');
+    });
+    it('should return null', async () => {
+      const user = await userService.deleteUser('etesta@teset.com');
+      expect(user).toBe(null);
     });
   });
 });
