@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   UploadedFile,
@@ -35,8 +37,12 @@ export class MoviesController {
   @ApiOperation({ summary: 'Get one movie by id' })
   @ApiResponse({ status: 200, type: Movie })
   @Get('/:movie_id')
-  getOneMovie(@Param('movie_id') movie_id: string): Promise<Movie> {
-    return this.movieService.getOneMovie(Number(movie_id));
+  async getOneMovie(@Param('movie_id') movie_id: string): Promise<Movie> {
+    const movie = await this.movieService.getOneMovie(Number(movie_id));
+    if (!movie) {
+      throw new HttpException('Movie not found', HttpStatus.NOT_FOUND);
+    }
+    return movie;
   }
 
   @ApiOperation({ summary: 'Create new movie' })
@@ -45,11 +51,18 @@ export class MoviesController {
   @UseGuards(AuthGuard, RoleGuard)
   @UseInterceptors(FileInterceptor('poster'))
   @Post('/create')
-  createMovie(
+  async createMovie(
     @Body() createMovieDto: CreateMovieDto,
     @UploadedFile() poster: string,
-  ) {
-    return this.movieService.createMovie({ ...createMovieDto, poster });
+  ): Promise<Movie> {
+    const movie = await this.movieService.createMovie({
+      ...createMovieDto,
+      poster,
+    });
+    if (!movie) {
+      throw new HttpException('Movie is exist', HttpStatus.NOT_FOUND);
+    }
+    return movie;
   }
 
   @ApiOperation({ summary: 'Delete movie' })
@@ -57,7 +70,11 @@ export class MoviesController {
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('/:movie_id')
-  deleteMovie(@Param('movie_id') movie_id: string): Promise<string> {
-    return this.movieService.deleteMovie(Number(movie_id));
+  async deleteMovie(@Param('movie_id') movie_id: string): Promise<string> {
+    const movie = await this.movieService.deleteMovie(Number(movie_id));
+    if (!movie) {
+      throw new HttpException('Movie not found', HttpStatus.NOT_FOUND);
+    }
+    return movie;
   }
 }

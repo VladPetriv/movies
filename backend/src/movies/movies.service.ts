@@ -24,18 +24,14 @@ export class MoviesService {
     const movie = await this.movieRepository.findOne(movie_id, {
       relations: ['actors', 'genre'],
     });
-    if (!movie) {
-      throw new HttpException('Movie not found', HttpStatus.NOT_FOUND);
-    }
+    if (!movie) return null;
     return movie;
   }
   async createMovie(dto: CreateMovieDto) {
     const candidate = await this.movieRepository.findOne({
       where: { title: dto.title },
     });
-    if (candidate) {
-      throw new HttpException('Movie is exist', HttpStatus.BAD_REQUEST);
-    }
+    if (candidate) return null;
     const genre = await this.genreService.getOneByName(dto.genre_name);
     const poster = await this.fileService.createFile(dto.poster);
     const movie = await this.movieRepository.create({ ...dto, poster, genre });
@@ -45,9 +41,7 @@ export class MoviesService {
 
   async deleteMovie(movie_id: number): Promise<string> {
     const movie = await this.movieRepository.findOne(movie_id);
-    if (!movie) {
-      throw new HttpException('Movie not found', HttpStatus.NOT_FOUND);
-    }
+    if (!movie) return null;
     await this.movieRepository.delete({ id: movie.id });
     return 'Movie was deleted';
   }

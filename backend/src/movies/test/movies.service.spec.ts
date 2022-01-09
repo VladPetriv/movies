@@ -102,13 +102,8 @@ describe('MoviesService', () => {
       expect(movie.budget).toBe('2000$');
     });
 
-    it('should throw an error that movie is not exist', async () => {
-      try {
-        await service.getOneMovie(movieId.id + 1);
-      } catch (err) {
-        expect(err.message).toBe('Movie not found');
-        expect(err).toBeInstanceOf(HttpException);
-      }
+    it('should return null', async () => {
+      expect(await service.getOneMovie(movieId.id + 1)).toBe(null);
     });
   });
 
@@ -137,8 +132,8 @@ describe('MoviesService', () => {
       expect(movie.budget).toBe('2000$');
     });
 
-    it('should throw an error that movie is exist', async () => {
-      try {
+    it('should return null', async () => {
+      expect(
         await service.createMovie({
           title: 'test.',
           description: 'test.',
@@ -147,11 +142,8 @@ describe('MoviesService', () => {
           country: 'USA',
           poster: 'test.jpg',
           genre_name: genre.name,
-        });
-      } catch (err) {
-        expect(err.message).toBe('Movie is exist');
-        expect(err).toBeInstanceOf(HttpException);
-      }
+        }),
+      ).toBe(null);
     });
   });
 
@@ -177,13 +169,8 @@ describe('MoviesService', () => {
       const movie = await service.deleteMovie(movieId.id);
       expect(movie).toBe('Movie was deleted');
     });
-    it('should throw an error that movie not found', async () => {
-      try {
-        await service.deleteMovie(movieId.id + 1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(HttpException);
-        expect(err.message).toBe('Movie not found');
-      }
+    it('should return null', async () => {
+      expect(await service.deleteMovie(movieId.id + 1)).toBe(null);
     });
   });
 });

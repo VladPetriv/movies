@@ -47,14 +47,14 @@ describe('MoviesController', () => {
   };
 
   const mockGenreService = {
-    getOneByName:jest.fn((name:string)=>{
+    getOneByName: jest.fn((name: string) => {
       return {
-        id:1,
+        id: 1,
         name,
-        description:'test'
-      }
-    })
-  }
+        description: 'test',
+      };
+    }),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -80,9 +80,9 @@ describe('MoviesController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
-  it('should create movie', () => {
+  it('should create movie', async () => {
     expect(
-      controller.createMovie(
+      await controller.createMovie(
         {
           title: 'test',
           description: 'test.',
@@ -90,7 +90,7 @@ describe('MoviesController', () => {
           year: 2020,
           country: 'USA',
           poster: 'test.jpg',
-          genre_name:'name'
+          genre_name: 'name',
         },
         'test.jpg',
       ),
@@ -102,14 +102,14 @@ describe('MoviesController', () => {
       year: 2020,
       country: 'USA',
       poster: 'test.jpg',
-      genre_name:'name'
+      genre_name: 'name',
     });
   });
-  it('should return all movies', () => {
-    expect(controller.getAllMovies()).toStrictEqual([]);
+  it('should return all movies', async () => {
+    expect(await controller.getAllMovies()).toStrictEqual([]);
   });
-  it('should return movie by id', () => {
-    expect(controller.getOneMovie('1')).toEqual({
+  it('should return movie by id', async () => {
+    expect(await controller.getOneMovie('1')).toEqual({
       id: 1,
       title: 'test',
       description: 'test.',
@@ -119,7 +119,7 @@ describe('MoviesController', () => {
       poster: 'test.jpg',
     });
   });
-  it('should delete movie', () => {
-    expect(controller.deleteMovie('1')).toEqual('Movie was deleted');
+  it('should delete movie', async () => {
+    expect(await controller.deleteMovie('1')).toEqual('Movie was deleted');
   });
 });
