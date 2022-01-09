@@ -6,6 +6,8 @@ import {
   Param,
   Body,
   UseGuards,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
@@ -23,15 +25,19 @@ export class GenresController {
   @ApiOperation({ summary: 'Get all genres' })
   @ApiResponse({ status: 200, type: [Genre] })
   @Get('')
-  getAllGenres(): Promise<Genre[]> {
-    return this.genreService.getAll();
+  async getAllGenres(): Promise<Genre[]> {
+    return await this.genreService.getAll();
   }
 
   @ApiOperation({ summary: 'Get one genre by id' })
   @ApiResponse({ status: 200, type: Genre })
   @Get('/:genre_id')
-  getOneGenre(@Param('genre_id') genre_id: string): Promise<Genre> {
-    return this.genreService.getOne(Number(genre_id));
+  async getOneGenre(@Param('genre_id') genre_id: string): Promise<Genre> {
+    const genre = await this.genreService.getOne(Number(genre_id));
+    if (!genre) {
+      throw new HttpException('Genre not found', HttpStatus.NOT_FOUND);
+    }
+    return genre;
   }
 
   @ApiOperation({ summary: 'Create new genre' })
@@ -39,8 +45,12 @@ export class GenresController {
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
   @Post('/create')
-  createGenre(@Body() createGenreDto: CreateGenreDto): Promise<Genre> {
-    return this.genreService.create(createGenreDto);
+  async createGenre(@Body() createGenreDto: CreateGenreDto): Promise<Genre> {
+    const genre = await this.genreService.create(createGenreDto);
+    if (!genre) {
+      throw new HttpException('Genre is exist', HttpStatus.BAD_REQUEST);
+    }
+    return genre;
   }
 
   @ApiOperation({ summary: 'Delete genre' })
@@ -48,7 +58,11 @@ export class GenresController {
   @Roles('ADMIN')
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('/:genre_id')
-  deleteGenre(@Param('genre_id') genre_id: string): Promise<string> {
-    return this.genreService.delete(Number(genre_id));
+  async deleteGenre(@Param('genre_id') genre_id: string): Promise<string> {
+    const genre = await this.genreService.delete(Number(genre_id));
+    if (!genre) {
+      throw new HttpException('Genre not found', HttpStatus.NOT_FOUND);
+    }
+    return genre;
   }
 }

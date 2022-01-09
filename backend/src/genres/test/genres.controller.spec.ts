@@ -51,26 +51,26 @@ describe('GenresController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
-  it('should return all genres', () => {
-    expect(controller.getAllGenres()).toStrictEqual([]);
+  it('should return all genres', async () => {
+    expect(await controller.getAllGenres()).toStrictEqual([]);
   });
-  it('should return genre by id', () => {
-    expect(controller.getOneGenre('1')).toEqual({
+  it('should return genre by id', async () => {
+    expect(await controller.getOneGenre('1')).toEqual({
       id: 1,
       name: 'test1',
       description: 'test',
     });
   });
-  it('should create genre and return it', () => {
+  it('should create genre and return it', async () => {
     expect(
-      controller.createGenre({ name: 'test2', description: 'test' }),
+      await controller.createGenre({ name: 'test2', description: 'test' }),
     ).toEqual({
       id: 1,
       name: 'test2',
       description: 'test',
     });
   });
-  it('should delete genre and return message', () => {
-    expect(controller.deleteGenre('1')).toEqual('Genre was deleted');
+  it('should delete genre and return message', async () => {
+    expect(await controller.deleteGenre('1')).toEqual('Genre was deleted');
   });
 });

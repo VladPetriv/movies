@@ -63,13 +63,8 @@ describe('GenresService', () => {
       expect(genre.name).toBe('test1');
       expect(genre.description).toBe('test');
     });
-    it('should throw an error that genre not found', async () => {
-      try {
-        await service.getOne(genreId.id + 1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(HttpException);
-        expect(err.message).toBe('Genre not found');
-      }
+    it('should return null', async () => {
+      expect(await service.getOne(genreId.id + 1)).toBe(null);
     });
   });
   describe('Create genre tests', () => {
@@ -87,13 +82,10 @@ describe('GenresService', () => {
       expect(genre.name).toBe('test3');
       expect(genre.description).toBe('test');
     });
-    it('should throw an error that genre is exist', async () => {
-      try {
-        await service.create({ name: 'test3', description: 'test' });
-      } catch (err) {
-        expect(err).toBeInstanceOf(HttpException);
-        expect(err.message).toBe('Genre is exist');
-      }
+    it('should return null', async () => {
+      expect(await service.create({ name: 'test3', description: 'test' })).toBe(
+        null,
+      );
     });
   });
   describe('Delete genre tests', () => {
@@ -106,13 +98,8 @@ describe('GenresService', () => {
 
       expect(genre).toBe('Genre was deleted');
     });
-    it('should throw an error that genre not found', async () => {
-      try {
-        await service.delete(genreId.id + 1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(HttpException);
-        expect(err.message).toBe('Genre not found');
-      }
+    it('should return null', async () => {
+      expect(await service.delete(genreId.id + 1)).toBe(null);
     });
   });
 });
