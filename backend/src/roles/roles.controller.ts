@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './roles.entity';
@@ -10,11 +18,15 @@ export class RolesController {
   constructor(private roleService: RolesService) {}
 
   @Post('/create')
-  create(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
-    return this.roleService.create(createRoleDto);
+  async create(@Body() createRoleDto: CreateRoleDto): Promise<Role> {
+    return await this.roleService.create(createRoleDto);
   }
   @Get('/:value')
-  getByValue(@Param('value') value: string): Promise<Role> {
-    return this.roleService.getRoleByValue(value);
+  async getByValue(@Param('value') value: string): Promise<Role> {
+    const role = await this.roleService.getRoleByValue(value);
+    if (!role) {
+      throw new HttpException('Role not found', HttpStatus.NOT_FOUND);
+    }
+    return role;
   }
 }

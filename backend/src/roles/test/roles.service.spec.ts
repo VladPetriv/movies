@@ -68,5 +68,9 @@ describe('RolesService', () => {
       expect(role.value).toBe(value);
       expect(role.description).toBe(description);
     });
+    it('should return null', async () => {
+      const role = await service.getRoleByValue('test');
+      expect(role).toBe(null);
+    });
   });
 });

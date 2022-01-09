@@ -36,9 +36,9 @@ describe('RolesController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
-  it('should create a role', () => {
+  it('should create a role', async () => {
     expect(
-      controller.create({
+      await controller.create({
         value: 'USER',
         description: 'Simple user',
       }),
@@ -48,9 +48,9 @@ describe('RolesController', () => {
       description: 'Simple user',
     });
   });
-  it('should return role by value', () => {
+  it('should return role by value', async () => {
     const value = 'test';
-    expect(controller.getByValue(value)).toEqual({
+    expect(await controller.getByValue(value)).toEqual({
       id: expect.any(Number),
       value,
       description: 'some description',
