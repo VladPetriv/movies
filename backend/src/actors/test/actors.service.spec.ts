@@ -116,13 +116,8 @@ describe('ActorsService', () => {
       expect(actor.age).toBe(20);
       expect(actor.description).toBe('tests.');
     });
-    it('should throw an error that actor not found', async () => {
-      try {
-        await service.getOneById(actorId.id + 1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(HttpException);
-        expect(err.message).toBe('Actor not found');
-      }
+    it('should return null', async () => {
+      expect(await service.getOneById(actorId.id + 1)).toBe(null);
     });
   });
   describe('Create actor tests', () => {
@@ -143,8 +138,8 @@ describe('ActorsService', () => {
         genre_name: genre.name,
       });
     });
-    it('should throw an error that movie not found', async () => {
-      try {
+    it('should return null', async () => {
+      expect(
         await service.create(
           {
             name: 'tests',
@@ -153,11 +148,8 @@ describe('ActorsService', () => {
             image: 'image.jpg',
           },
           movie.id + 1,
-        );
-      } catch (err) {
-        expect(err).toBeInstanceOf(HttpException);
-        expect(err.message).toBe('Movie not found');
-      }
+        ),
+      ).toBe(null);
     });
 
     it('should create an actor', async () => {
@@ -175,21 +167,18 @@ describe('ActorsService', () => {
       expect(actor.age).toBe(20);
       expect(actor.description).toBe('tests.');
     });
-    it('should throw an error that actor is exist', async () => {
-      try {
+    it('should return null', async () => {
+      expect(
         await service.create(
           {
-            name: 'test__',
+            name: 'tests',
             age: 20,
             description: 'tests.',
             image: 'image.jpg',
           },
           movie.id,
-        );
-      } catch (err) {
-        expect(err).toBeInstanceOf(HttpException);
-        expect(err.message).toBe('Actor is exist');
-      }
+        ),
+      ).toBe(null);
     });
   });
   describe('Delete actor tests', () => {
@@ -224,13 +213,8 @@ describe('ActorsService', () => {
       const actor = await service.delete(actorId.id);
       expect(actor).toBe('Actor was deleted');
     });
-    it('should throw an error that actor not found', async () => {
-      try {
-        await service.delete(actorId.id + 1);
-      } catch (err) {
-        expect(err).toBeInstanceOf(HttpException);
-        expect(err.message).toBe('Actor not found');
-      }
+    it('should return null', async () => {
+      expect(await service.delete(actorId.id + 1)).toBe(null);
     });
   });
 });

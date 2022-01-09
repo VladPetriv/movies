@@ -70,11 +70,11 @@ describe('ActorsController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
-  it('should return all actors', () => {
-    expect(controller.getAllActors()).toStrictEqual([]);
+  it('should return all actors', async () => {
+    expect(await controller.getAllActors()).toStrictEqual([]);
   });
-  it('should return user by id', () => {
-    expect(controller.getOneActor('1')).toStrictEqual({
+  it('should return user by id', async () => {
+    expect(await controller.getOneActor('1')).toStrictEqual({
       id: 1,
       name: 'test',
       age: 20,
@@ -82,9 +82,9 @@ describe('ActorsController', () => {
       image: 'test.jpg',
     });
   });
-  it('should create user', () => {
+  it('should create user', async () => {
     expect(
-      controller.createActor(
+      await controller.createActor(
         '1',
         {
           name: 'test',

@@ -21,9 +21,7 @@ export class ActorsService {
 
   async getOneById(actor_id: number): Promise<Actor> {
     const actor = await this.actorRepository.findOne(actor_id);
-    if (!actor) {
-      throw new HttpException('Actor not found', HttpStatus.NOT_FOUND);
-    }
+    if (!actor) return null;
     return actor;
   }
 
@@ -33,12 +31,8 @@ export class ActorsService {
       where: { name: dto.name },
     });
     const movie = await this.movieService.getOneMovie(movie_id);
-    if (candidate) {
-      throw new HttpException('Actor is exist', HttpStatus.BAD_REQUEST);
-    }
-    if (!movie) {
-      throw new HttpException('Movie not found', HttpStatus.NOT_FOUND);
-    }
+    if (candidate) return null;
+    if (!movie) return null;
     const actor = await this.actorRepository.create({
       ...dto,
       image: fileName,
@@ -50,9 +44,7 @@ export class ActorsService {
 
   async delete(actor_id: number): Promise<string> {
     const actor = await this.actorRepository.findOne(actor_id);
-    if (!actor) {
-      throw new HttpException('Actor not found', HttpStatus.NOT_FOUND);
-    }
+    if (!actor) return null;
     await this.actorRepository.delete({ id: actor.id });
     return 'Actor was deleted';
   }
