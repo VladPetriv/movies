@@ -6,10 +6,12 @@ import {
   ManyToMany,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from '../roles/roles.entity';
 import { Favourite } from '../favourite/entities/favourite.entity';
+import { Rating } from '../rating/rating.entity';
 
 @Entity()
 export class User {
@@ -54,4 +56,7 @@ export class User {
   })
   @JoinColumn()
   favourite: Favourite;
+
+  @OneToMany(() => Rating, (rating) => rating.user)
+  ratings: Rating[];
 }

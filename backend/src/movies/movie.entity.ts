@@ -9,6 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { Actor } from '../actors/actor.entity';
 import { Genre } from '../genres/genre.entity';
+import { Rating } from '../rating/rating.entity';
 @Entity()
 export class Movie {
   @ApiProperty({ example: '1', description: 'Unique movie id' })
@@ -65,4 +66,7 @@ export class Movie {
   @OneToOne(() => Genre)
   @JoinColumn()
   genre: Genre;
+
+  @OneToMany(() => Rating, (rating) => rating.movie)
+  ratings: Rating[];
 }
