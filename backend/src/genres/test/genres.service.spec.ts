@@ -5,7 +5,6 @@ import { getConnection, getRepository, Repository } from 'typeorm';
 import { TestHelper } from '../../util/test-helper';
 import { Genre } from '../genre.entity';
 import { GenresService } from '../genres.service';
-import { HttpException } from '@nestjs/common';
 
 describe('GenresService', () => {
   let service: GenresService;

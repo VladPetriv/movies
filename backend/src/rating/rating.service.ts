@@ -56,7 +56,9 @@ export class RatingService {
         user,
         movie,
       },
+      relations: ['user', 'movie'],
     });
+    console.log(rating);
     return rating;
   }
 
@@ -71,7 +73,11 @@ export class RatingService {
       },
     });
     if (candidate) return null;
-    const rating = await this.ratingRepository.create(dto);
+    const rating = await this.ratingRepository.create({
+      value: dto.value,
+      movie,
+      user,
+    });
     await this.ratingRepository.save(rating);
     return rating;
   }
