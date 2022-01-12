@@ -13,6 +13,9 @@ import { FilesService } from '../../files/files.service';
 import { Actor } from '../../actors/actor.entity';
 import { Genre } from '../../genres/genre.entity';
 import { GenresService } from '../../genres/genres.service';
+import { Rating } from '../../rating/rating.entity';
+import { User } from '../../users/user.entity';
+import { Role } from '../../roles/roles.entity';
 
 describe('FavouriteService', () => {
   let service: FavouriteService;
@@ -30,6 +33,9 @@ describe('FavouriteService', () => {
     Movie,
     Actor,
     Genre,
+    Rating,
+    User,
+    Role,
   ]);
 
   beforeAll(async () => {

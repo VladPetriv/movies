@@ -22,7 +22,7 @@ export class RatingController {
     return await this.ratingService.getAllRatings();
   }
 
-  @Get(':movie_id')
+  @Get('/movie/:movie_id')
   async getAllByMovie(@Param('movie_id') movie_id: string): Promise<Rating[]> {
     const ratings = await this.ratingService.getAllRatingsByMovie(
       Number(movie_id),
@@ -35,7 +35,7 @@ export class RatingController {
     }
     return ratings;
   }
-  @Get(':user_email')
+  @Get('/user/:user_email')
   async getAllByUser(
     @Param('user_email') user_email: string,
   ): Promise<Rating[]> {
@@ -62,7 +62,7 @@ export class RatingController {
     }
     return rating;
   }
-  @Post()
+  @Post('/create')
   async createRating(
     @Body() createRatingDto: CreateRatingDto,
   ): Promise<Rating> {

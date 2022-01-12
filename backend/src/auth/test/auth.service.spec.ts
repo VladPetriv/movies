@@ -19,6 +19,7 @@ import { FilesService } from '../../files/files.service';
 import { Actor } from '../../actors/actor.entity';
 import { Genre } from '../../genres/genre.entity';
 import { GenresService } from '../../genres/genres.service';
+import { Rating } from '../../rating/rating.entity';
 describe('AuthService', () => {
   let service: AuthService;
   let userService: UsersService;
@@ -42,6 +43,7 @@ describe('AuthService', () => {
     Movie,
     Actor,
     Genre,
+    Rating,
   ]);
 
   beforeEach(async () => {

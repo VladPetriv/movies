@@ -17,6 +17,7 @@ import { FilesModule } from '../../files/files.module';
 import { Actor } from '../../actors/actor.entity';
 import { Genre } from '../../genres/genre.entity';
 import { GenresService } from '../../genres/genres.service';
+import { Rating } from '../../rating/rating.entity';
 
 describe('UsersService', () => {
   let userService: UsersService;
@@ -41,6 +42,7 @@ describe('UsersService', () => {
     Movie,
     Actor,
     Genre,
+    Rating,
   ]);
 
   beforeAll(async () => {

@@ -12,6 +12,11 @@ import { Movie } from '../../movies/movie.entity';
 import { MoviesService } from '../../movies/movies.service';
 import { Genre } from '../../genres/genre.entity';
 import { GenresService } from '../../genres/genres.service';
+import { Rating } from '../../rating/rating.entity';
+import { User } from '../../users/user.entity';
+import { Role } from '../../roles/roles.entity';
+import { Favourite } from '../../favourite/entities/favourite.entity';
+import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
 
 describe('ActorsService', () => {
   let service: ActorsService;
@@ -22,7 +27,16 @@ describe('ActorsService', () => {
   let genreRepository: Repository<Genre>;
 
   const connectionName = 'tests';
-  const testHelper = new TestHelper(connectionName, [Actor, Movie, Genre]);
+  const testHelper = new TestHelper(connectionName, [
+    Actor,
+    Movie,
+    Genre,
+    Rating,
+    User,
+    Role,
+    Favourite,
+    FavouriteItem,
+  ]);
 
   beforeAll(async () => {
     await Test.createTestingModule({
