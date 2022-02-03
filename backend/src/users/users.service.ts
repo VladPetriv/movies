@@ -7,6 +7,8 @@ import { FavouriteService } from '../favourite/favourite.service';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { AddRoleDto } from './dto/add-role.dto';
+import { NotFoundError } from '../errors/NotFoundError';
+
 @Injectable()
 export class UsersService {
   constructor(
@@ -32,7 +34,9 @@ export class UsersService {
       where: { email },
       relations: ['roles', 'favourite'],
     });
-    if (!user) return null;
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
     return user;
   }
 
@@ -53,7 +57,7 @@ export class UsersService {
       await this.userRepository.save(user);
       return user;
     }
-    return null;
+    throw new NotFoundError('User or role not found');
   }
 
   async banUser(dto: BanUserDto): Promise<User> {
@@ -61,7 +65,7 @@ export class UsersService {
       where: { id: dto.userId },
       relations: ['roles', 'favourite'],
     });
-    if (!user) return null;
+    if (!user) throw new NotFoundError('User not found');
 
     user.ban = true;
     user.banReason = dto.reason;
@@ -71,7 +75,7 @@ export class UsersService {
 
   async deleteUser(email: string): Promise<string> {
     const user = await this.getUserByEmail(email);
-    if (!user) return null;
+    if (!user) throw new NotFoundError('User not found');
 
     await this.userRepository.delete({ id: user.id });
     return 'User was deleted';

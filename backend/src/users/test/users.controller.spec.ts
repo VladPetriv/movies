@@ -12,9 +12,11 @@ describe('UsersController', () => {
   const mockAuthGuard = {
     canActivate: jest.fn(() => true),
   };
+
   const mockRoleGuard = {
     canActivate: jest.fn(() => true),
   };
+
   const mockUserService = {
     getAllUsers: jest.fn(() => []),
     createUser: jest.fn((dto: CreateUserDto) => {
@@ -57,23 +59,12 @@ describe('UsersController', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
-  it('should return all users', () => {
-    expect(controller.getAllUsers()).toStrictEqual([]);
+  it('should return all users', async () => {
+    expect(await controller.getAllUsers()).toStrictEqual([]);
   });
-  it('should create new user', () => {
-    expect(
-      controller.create({
-        email: 'test@test.com',
-        password: 'test',
-      }),
-    ).toEqual({
-      id: 1,
-      email: 'test@test.com',
-      password: 'test',
-    });
-  });
-  it('should ban user', () => {
-    expect(controller.banUser({ userId: 1, reason: 'test' })).toEqual({
+
+  it('should ban user', async () => {
+    expect(await controller.banUser({ userId: 1, reason: 'test' })).toEqual({
       id: 1,
       email: 'test@test.com',
       password: 'test',
@@ -81,7 +72,8 @@ describe('UsersController', () => {
       banReason: 'test',
     });
   });
-  it('should delete user', () => {
-    expect(controller.deleteUser('test@test.com'));
+
+  it('should delete user', async () => {
+    expect(await controller.deleteUser('test@test.com'));
   });
 });
