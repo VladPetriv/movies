@@ -6,11 +6,13 @@ import {
   HttpStatus,
   Param,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateRatingDto } from './dto/create-rating.dto';
 import { Rating } from './rating.entity';
 import { RatingService } from './rating.service';
+import { AuthGuard } from '../auth/auth.guard';
 
 @ApiTags('Rating controller')
 @Controller('rating')
@@ -23,6 +25,7 @@ export class RatingController {
   }
 
   @Get('/movie/:movie_id')
+  @UseGuards(AuthGuard)
   async getAllByMovie(@Param('movie_id') movie_id: string): Promise<Rating[]> {
     const ratings = await this.ratingService.getAllRatingsByMovie(
       Number(movie_id),
@@ -36,6 +39,7 @@ export class RatingController {
     return ratings;
   }
   @Get('/user/:user_email')
+  @UseGuards(AuthGuard)
   async getAllByUser(
     @Param('user_email') user_email: string,
   ): Promise<Rating[]> {
@@ -45,7 +49,9 @@ export class RatingController {
     }
     return ratings;
   }
+
   @Get('/:user_email/:movie_id')
+  @UseGuards(AuthGuard)
   async getUserRatingByMovie(
     @Param('user_email') user_email: string,
     @Param('movie_id') movie_id: string,
@@ -63,6 +69,7 @@ export class RatingController {
     return rating;
   }
   @Post('/create')
+  @UseGuards(AuthGuard)
   async createRating(
     @Body() createRatingDto: CreateRatingDto,
   ): Promise<Rating> {

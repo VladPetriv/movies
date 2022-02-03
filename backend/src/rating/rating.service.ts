@@ -58,7 +58,6 @@ export class RatingService {
       },
       relations: ['user', 'movie'],
     });
-    console.log(rating);
     return rating;
   }
 
