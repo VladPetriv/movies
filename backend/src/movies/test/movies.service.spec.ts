@@ -15,6 +15,8 @@ import { User } from '../../users/user.entity';
 import { Role } from '../../roles/roles.entity';
 import { Favourite } from '../../favourite/entities/favourite.entity';
 import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
+import { RecordIsExistError } from '../../errors/RecordIsExistError';
+import { NotFoundError } from '../../errors/NotFoundError';
 
 describe('MoviesService', () => {
   let service: MoviesService;
@@ -115,8 +117,13 @@ describe('MoviesService', () => {
       expect(movie.budget).toBe('2000$');
     });
 
-    it('should return null', async () => {
-      expect(await service.getOneMovie(movieId.id + 1)).toBe(null);
+    it('should throw error that movie not found', async () => {
+      try {
+        await service.getOneMovie(movieId.id + 1);
+      } catch (err) {
+        expect(err.message).toBe('Movie not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
 
@@ -145,8 +152,8 @@ describe('MoviesService', () => {
       expect(movie.budget).toBe('2000$');
     });
 
-    it('should return null', async () => {
-      expect(
+    it('should throw error that movie is exist', async () => {
+      try {
         await service.createMovie({
           title: 'test.',
           description: 'test.',
@@ -155,8 +162,11 @@ describe('MoviesService', () => {
           country: 'USA',
           poster: 'test.jpg',
           genre_name: genre.name,
-        }),
-      ).toBe(null);
+        });
+      } catch (err) {
+        expect(err.message).toBe('Movie is exist');
+        expect(err).toBeInstanceOf(RecordIsExistError);
+      }
     });
   });
 
@@ -182,8 +192,13 @@ describe('MoviesService', () => {
       const movie = await service.deleteMovie(movieId.id);
       expect(movie).toBe('Movie was deleted');
     });
-    it('should return null', async () => {
-      expect(await service.deleteMovie(movieId.id + 1)).toBe(null);
+    it('should throw error that movie not found', async () => {
+      try {
+        await service.deleteMovie(movieId.id + 1);
+      } catch (err) {
+        expect(err.message).toBe('Movie not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
 });
