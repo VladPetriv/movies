@@ -1,10 +1,12 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Actor } from './actor.entity';
-import { CreateActorDto } from './dto/create-actor.dto';
+import { NotFoundError } from '../errors/NotFoundError';
+import { RecordIsExistError } from '../errors/RecordIsExistError';
 import { FilesService } from '../files/files.service';
 import { MoviesService } from '../movies/movies.service';
+import { Actor } from './actor.entity';
+import { CreateActorDto } from './dto/create-actor.dto';
 
 @Injectable()
 export class ActorsService {
@@ -21,7 +23,9 @@ export class ActorsService {
 
   async getOneById(actor_id: number): Promise<Actor> {
     const actor = await this.actorRepository.findOne(actor_id);
-    if (!actor) return null;
+    if (!actor) {
+      throw new NotFoundError('Actor not found');
+    }
     return actor;
   }
 
@@ -31,8 +35,9 @@ export class ActorsService {
       where: { name: dto.name },
     });
     const movie = await this.movieService.getOneMovie(movie_id);
-    if (candidate) return null;
-    if (!movie) return null;
+    if (candidate) {
+      throw new RecordIsExistError('Actor is exist');
+    }
     const actor = await this.actorRepository.create({
       ...dto,
       image: fileName,
@@ -44,7 +49,9 @@ export class ActorsService {
 
   async delete(actor_id: number): Promise<string> {
     const actor = await this.actorRepository.findOne(actor_id);
-    if (!actor) return null;
+    if (!actor) {
+      throw new NotFoundError('Actor not found');
+    }
     await this.actorRepository.delete({ id: actor.id });
     return 'Actor was deleted';
   }

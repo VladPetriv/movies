@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
-import { RolesService } from '../roles/roles.service';
+import { NotFoundError } from '../errors/NotFoundError';
 import { FavouriteService } from '../favourite/favourite.service';
+import { RolesService } from '../roles/roles.service';
+import { AddRoleDto } from './dto/add-role.dto';
 import { BanUserDto } from './dto/ban-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AddRoleDto } from './dto/add-role.dto';
-import { NotFoundError } from '../errors/NotFoundError';
+import { User } from './user.entity';
 
 @Injectable()
 export class UsersService {
@@ -57,7 +57,7 @@ export class UsersService {
       await this.userRepository.save(user);
       return user;
     }
-    throw new NotFoundError('User or role not found');
+    throw new NotFoundError('User not found');
   }
 
   async banUser(dto: BanUserDto): Promise<User> {
@@ -65,7 +65,9 @@ export class UsersService {
       where: { id: dto.userId },
       relations: ['roles', 'favourite'],
     });
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
 
     user.ban = true;
     user.banReason = dto.reason;
@@ -75,7 +77,9 @@ export class UsersService {
 
   async deleteUser(email: string): Promise<string> {
     const user = await this.getUserByEmail(email);
-    if (!user) throw new NotFoundError('User not found');
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
 
     await this.userRepository.delete({ id: user.id });
     return 'User was deleted';

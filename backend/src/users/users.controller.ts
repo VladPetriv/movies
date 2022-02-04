@@ -49,6 +49,7 @@ export class UsersController {
       }
     }
   }
+
   @ApiOperation({ summary: 'Ban user' })
   @ApiResponse({ status: 200, type: User })
   @Roles('ADMIN')
@@ -67,8 +68,8 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Delete user' })
   @ApiResponse({ status: 200, type: 'User was deleted' })
-  @Roles('USER')
-  @UseGuards(AuthGuard)
+  //  @Roles('USER')
+  //  @UseGuards(AuthGuard)
   @Delete()
   async deleteUser(@Body() email: string): Promise<string> {
     try {

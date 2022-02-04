@@ -1,24 +1,24 @@
+import { ConfigModule } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository, getConnection, getRepository } from 'typeorm';
-import { ConfigModule } from '@nestjs/config';
-import { UsersService } from '../users.service';
-import { User } from '../user.entity';
+import { getConnection, getRepository, Repository } from 'typeorm';
+import { Actor } from '../../actors/actor.entity';
+import { NotFoundError } from '../../errors/NotFoundError';
+import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
+import { Favourite } from '../../favourite/entities/favourite.entity';
+import { FavouriteService } from '../../favourite/favourite.service';
+import { FilesModule } from '../../files/files.module';
+import { FilesService } from '../../files/files.service';
+import { Genre } from '../../genres/genre.entity';
+import { GenresService } from '../../genres/genres.service';
+import { Movie } from '../../movies/movie.entity';
+import { MoviesService } from '../../movies/movies.service';
+import { Rating } from '../../rating/rating.entity';
 import { Role } from '../../roles/roles.entity';
 import { RolesService } from '../../roles/roles.service';
 import { TestHelper } from '../../util/test-helper';
-import { FavouriteService } from '../../favourite/favourite.service';
-import { Favourite } from '../../favourite/entities/favourite.entity';
-import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
-import { MoviesService } from '../../movies/movies.service';
-import { Movie } from '../../movies/movie.entity';
-import { FilesService } from '../../files/files.service';
-import { FilesModule } from '../../files/files.module';
-import { Actor } from '../../actors/actor.entity';
-import { Genre } from '../../genres/genre.entity';
-import { GenresService } from '../../genres/genres.service';
-import { Rating } from '../../rating/rating.entity';
-import { NotFoundError } from '../../errors/NotFoundError';
+import { User } from '../user.entity';
+import { UsersService } from '../users.service';
 
 describe('UsersService', () => {
   let userService: UsersService;
@@ -233,14 +233,14 @@ describe('UsersService', () => {
       expect(user['roles'].length).toBe(2);
       expect(user['roles'][1].value).toBe(newRoleValue);
     });
-    it('should throw error that user not found', async () => {
+    it('should throw error that role not found', async () => {
       try {
         await userService.addRole({
           userId: createdUser.id,
           value: '',
         });
       } catch (err) {
-        expect(err.message).toBe('User or role not found');
+        expect(err.message).toBe('Role not found');
         expect(err).toBeInstanceOf(NotFoundError);
       }
     });
@@ -251,7 +251,7 @@ describe('UsersService', () => {
           value: 'ADMIN',
         });
       } catch (err) {
-        expect(err.message).toBe('User or role not found');
+        expect(err.message).toBe('User not found');
         expect(err).toBeInstanceOf(NotFoundError);
       }
     });

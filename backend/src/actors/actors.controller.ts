@@ -1,23 +1,25 @@
 import {
-  Controller,
-  Get,
-  Post,
-  Delete,
-  Param,
-  UseInterceptors,
-  UploadedFile,
   Body,
-  UseGuards,
-  UsePipes,
-  ValidationPipe,
+  Controller,
+  Delete,
+  Get,
   HttpException,
   HttpStatus,
+  Param,
+  Post,
+  UploadedFile,
+  UseGuards,
+  UseInterceptors,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '../auth/auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RoleGuard } from '../auth/roles.guard';
+import { NotFoundError } from '../errors/NotFoundError';
+import { RecordIsExistError } from '../errors/RecordIsExistError';
 import { Actor } from './actor.entity';
 import { ActorsService } from './actors.service';
 import { CreateActorDto } from './dto/create-actor.dto';
@@ -39,11 +41,14 @@ export class ActorsController {
   @ApiResponse({ status: 200, type: Actor })
   @Get('/:actor_id')
   async getOneActor(@Param('actor_id') actor_id: string): Promise<Actor> {
-    const actor = await this.actorService.getOneById(Number(actor_id));
-    if (!actor) {
-      throw new HttpException('Actor not found', HttpStatus.NOT_FOUND);
+    try {
+      const actor = await this.actorService.getOneById(Number(actor_id));
+      return actor;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw new HttpException(err.message, HttpStatus.NOT_FOUND);
+      }
     }
-    return actor;
   }
 
   @ApiOperation({ summary: 'Create new actor' })
@@ -57,17 +62,19 @@ export class ActorsController {
     @Body() createActorDto: CreateActorDto,
     @UploadedFile() image: string,
   ): Promise<Actor> {
-    const actor = await this.actorService.create(
-      { ...createActorDto, image },
-      Number(movie_id),
-    );
-    if (!actor) {
-      throw new HttpException(
-        'Actor is exist or movie not found',
-        HttpStatus.BAD_REQUEST,
+    try {
+      const actor = await this.actorService.create(
+        { ...createActorDto, image },
+        Number(movie_id),
       );
+      return actor;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw new HttpException(err.message, HttpStatus.NOT_FOUND);
+      } else if (err instanceof RecordIsExistError) {
+        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      }
     }
-    return actor;
   }
 
   @ApiOperation({ summary: 'Delete actor' })
@@ -76,10 +83,13 @@ export class ActorsController {
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('/:actor_id')
   async deleteActor(@Param('actor_id') actor_id: string): Promise<string> {
-    const actor = await this.actorService.delete(Number(actor_id));
-    if (!actor) {
-      throw new HttpException('Actor not found', HttpStatus.NOT_FOUND);
+    try {
+      const actor = await this.actorService.delete(Number(actor_id));
+      return actor;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw new HttpException(err.message, HttpStatus.NOT_FOUND);
+      }
     }
-    return actor;
   }
 }

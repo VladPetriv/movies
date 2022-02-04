@@ -1,22 +1,23 @@
-import { Test } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
-import { HttpException } from '@nestjs/common';
-import { getConnection, getRepository, Repository } from 'typeorm';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Actor } from '../actor.entity';
-import { ActorsService } from '../actors.service';
+import { getConnection, getRepository, Repository } from 'typeorm';
+import { NotFoundError } from '../../errors/NotFoundError';
+import { RecordIsExistError } from '../../errors/RecordIsExistError';
+import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
+import { Favourite } from '../../favourite/entities/favourite.entity';
 import { FilesModule } from '../../files/files.module';
 import { FilesService } from '../../files/files.service';
-import { TestHelper } from '../../util/test-helper';
-import { Movie } from '../../movies/movie.entity';
-import { MoviesService } from '../../movies/movies.service';
 import { Genre } from '../../genres/genre.entity';
 import { GenresService } from '../../genres/genres.service';
+import { Movie } from '../../movies/movie.entity';
+import { MoviesService } from '../../movies/movies.service';
 import { Rating } from '../../rating/rating.entity';
-import { User } from '../../users/user.entity';
 import { Role } from '../../roles/roles.entity';
-import { Favourite } from '../../favourite/entities/favourite.entity';
-import { FavouriteItem } from '../../favourite/entities/favourite-item.entity';
+import { User } from '../../users/user.entity';
+import { TestHelper } from '../../util/test-helper';
+import { Actor } from '../actor.entity';
+import { ActorsService } from '../actors.service';
 
 describe('ActorsService', () => {
   let service: ActorsService;
@@ -130,8 +131,13 @@ describe('ActorsService', () => {
       expect(actor.age).toBe(20);
       expect(actor.description).toBe('tests.');
     });
-    it('should return null', async () => {
-      expect(await service.getOneById(actorId.id + 1)).toBe(null);
+    it('should throw error that actor not found', async () => {
+      try {
+        await service.getOneById(actorId.id + 1);
+      } catch (err) {
+        expect(err.message).toBe('Actor not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
   describe('Create actor tests', () => {
@@ -152,8 +158,8 @@ describe('ActorsService', () => {
         genre_name: genre.name,
       });
     });
-    it('should return null', async () => {
-      expect(
+    it('should throw error that movie not found', async () => {
+      try {
         await service.create(
           {
             name: 'tests',
@@ -162,8 +168,11 @@ describe('ActorsService', () => {
             image: 'image.jpg',
           },
           movie.id + 1,
-        ),
-      ).toBe(null);
+        );
+      } catch (err) {
+        expect(err.message).toBe('Movie not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
 
     it('should create an actor', async () => {
@@ -181,8 +190,8 @@ describe('ActorsService', () => {
       expect(actor.age).toBe(20);
       expect(actor.description).toBe('tests.');
     });
-    it('should return null', async () => {
-      expect(
+    it('should throw error that actor is exist', async () => {
+      try {
         await service.create(
           {
             name: 'tests',
@@ -191,8 +200,11 @@ describe('ActorsService', () => {
             image: 'image.jpg',
           },
           movie.id,
-        ),
-      ).toBe(null);
+        );
+      } catch (err) {
+        expect(err.message).toBe('Actor is exist');
+        expect(err).toBeInstanceOf(RecordIsExistError);
+      }
     });
   });
   describe('Delete actor tests', () => {
@@ -227,8 +239,13 @@ describe('ActorsService', () => {
       const actor = await service.delete(actorId.id);
       expect(actor).toBe('Actor was deleted');
     });
-    it('should return null', async () => {
-      expect(await service.delete(actorId.id + 1)).toBe(null);
+    it('should throw error that actor not found', async () => {
+      try {
+        await service.delete(actorId.id + 1);
+      } catch (err) {
+        expect(err.message).toBe('Actor not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
 });
