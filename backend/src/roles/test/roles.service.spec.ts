@@ -5,6 +5,7 @@ import { TestHelper } from '../../util/test-helper';
 import { getConnection, Repository, getRepository } from 'typeorm';
 import { Role } from '../roles.entity';
 import { RolesService } from '../roles.service';
+import { NotFoundError } from '../../errors/NotFoundError';
 
 describe('RolesService', () => {
   let service: RolesService;
@@ -68,9 +69,13 @@ describe('RolesService', () => {
       expect(role.value).toBe(value);
       expect(role.description).toBe(description);
     });
-    it('should return null', async () => {
-      const role = await service.getRoleByValue('test');
-      expect(role).toBe(null);
+    it('should throw error that role not found', async () => {
+      try {
+        await service.getRoleByValue('test');
+      } catch (err) {
+        expect(err.message).toBe('Role not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
 });

@@ -19,6 +19,7 @@ import { RolesService } from '../../roles/roles.service';
 import { FilesService } from '../../files/files.service';
 import { GenresService } from '../../genres/genres.service';
 import { FilesModule } from '../../files/files.module';
+import { NotFoundError } from '../../errors/NotFoundError';
 
 describe('RatingService', () => {
   let service: RatingService;
@@ -139,11 +140,11 @@ describe('RatingService', () => {
     let genre;
     beforeAll(async () => {
       genre = await genreService.create({
-        name: 'test_genre',
+        name: 'test_genre1',
         description: 'test_description',
       });
       movie = await movieService.createMovie({
-        title: 'test_movie',
+        title: 'test_movie1',
         description: 'test',
         poster: 'image.jpg',
         year: 2020,
@@ -159,27 +160,31 @@ describe('RatingService', () => {
       expect(rating).toStrictEqual([]);
     });
 
-    it('should return null', async () => {
-      const rating = await service.getAllRatingsByMovie(movie.id + 1);
-
-      expect(rating).toBe(null);
+    it('should throw error that movie not found', async () => {
+      try {
+        await service.getAllRatingsByMovie(movie.id + 1);
+      } catch (err) {
+        expect(err.message).toBe('Movie not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
 
   describe('Get all ratings by user', () => {
     let user;
-    let movie;
     let genre;
+
     beforeAll(async () => {
+      await roleService.create({ value: 'USER', description: 'test' });
       user = await userService.createUser({
-        email: 'test@test.com',
+        email: 'test1@test.com',
         password: 'test',
       });
       genre = await genreService.create({
         name: 'test_genre2',
         description: 'test_description',
       });
-      movie = await movieService.createMovie({
+      await movieService.createMovie({
         title: 'test_movie2',
         description: 'test',
         poster: 'image.jpg',
@@ -196,10 +201,13 @@ describe('RatingService', () => {
       expect(ratings).toStrictEqual([]);
     });
 
-    it('should return null', async () => {
-      const ratings = await service.getAllRatingsByUser('not_found_email');
-
-      expect(ratings).toBe(null);
+    it('should throw error that user not found', async () => {
+      try {
+        await service.getAllRatingsByUser('not_found_email');
+      } catch (err) {
+        expect(err.message).toBe('User not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
   describe('Get one rating which user set to movie', () => {
@@ -208,8 +216,9 @@ describe('RatingService', () => {
     let genre;
     let ratingC;
     beforeAll(async () => {
+      //     await roleService.create({ value: 'USER', description: 'test' });
       user = await userService.createUser({
-        email: 'test1@test.com',
+        email: 'test3@test.com',
         password: 'test',
       });
       genre = await genreService.create({
@@ -240,21 +249,21 @@ describe('RatingService', () => {
       expect(rating.user.email).toBe(user.email);
       expect(rating.movie.title).toBe(movie.title);
     });
-    it('should return null', async () => {
-      const rating = await service.getUserRatingByMovie(
-        'not_found_email',
-        movie.id,
-      );
-
-      expect(rating).toBe(null);
+    it('should throw error that user  not found', async () => {
+      try {
+        await service.getUserRatingByMovie('not_found_email', movie.id);
+      } catch (err) {
+        expect(err.message).toBe('User not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
-    it('should return null', async () => {
-      const rating = await service.getUserRatingByMovie(
-        'not_found_email',
-        movie.id + 1,
-      );
-
-      expect(rating).toBe(null);
+    it('should throw error that movie or user not found', async () => {
+      try {
+        await service.getUserRatingByMovie('test3@test.com', movie.id + 1);
+      } catch (err) {
+        expect(err.message).toBe('Movie not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
 });

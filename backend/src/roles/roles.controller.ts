@@ -8,6 +8,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { NotFoundError } from '../errors/NotFoundError';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './roles.entity';
 import { RolesService } from './roles.service';
@@ -23,10 +24,13 @@ export class RolesController {
   }
   @Get('/:value')
   async getByValue(@Param('value') value: string): Promise<Role> {
-    const role = await this.roleService.getRoleByValue(value);
-    if (!role) {
-      throw new HttpException('Role not found', HttpStatus.NOT_FOUND);
+    try {
+      const role = await this.roleService.getRoleByValue(value);
+      return role;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw new HttpException(err.message, HttpStatus.NOT_FOUND);
+      }
     }
-    return role;
   }
 }

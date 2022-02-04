@@ -5,6 +5,7 @@ import { Rating } from './rating.entity';
 import { MoviesService } from '../movies/movies.service';
 import { UsersService } from '../users/users.service';
 import { CreateRatingDto } from './dto/create-rating.dto';
+import { RecordIsExistError } from '../errors/RecordIsExistError';
 
 @Injectable()
 export class RatingService {
@@ -23,7 +24,6 @@ export class RatingService {
 
   async getAllRatingsByMovie(movie_id: number): Promise<Rating[]> {
     const movie = await this.movieService.getOneMovie(movie_id);
-    if (!movie) return null;
     const rating = await this.ratingRepository.find({
       where: {
         movie,
@@ -34,7 +34,6 @@ export class RatingService {
 
   async getAllRatingsByUser(user_email: string): Promise<Rating[]> {
     const user = await this.userService.getUserByEmail(user_email);
-    if (!user) return null;
     const rating = await this.ratingRepository.find({
       where: {
         user,
@@ -50,7 +49,6 @@ export class RatingService {
   ): Promise<Rating> {
     const user = await this.userService.getUserByEmail(user_email);
     const movie = await this.movieService.getOneMovie(movie_id);
-    if (!user || !movie) return null;
     const rating = await this.ratingRepository.findOne({
       where: {
         user,
@@ -64,14 +62,13 @@ export class RatingService {
   async createRating(dto: CreateRatingDto): Promise<Rating> {
     const user = await this.userService.getUserByEmail(dto.user_email);
     const movie = await this.movieService.getOneMovie(dto.movie_id);
-    if (!user || !movie) return null;
     const candidate = await this.ratingRepository.findOne({
       where: {
         movie,
         user,
       },
     });
-    if (candidate) return null;
+    if (candidate) throw new RecordIsExistError('Rating is exist');
     const rating = await this.ratingRepository.create({
       value: dto.value,
       movie,

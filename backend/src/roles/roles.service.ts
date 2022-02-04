@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { NotFoundError } from '../errors/NotFoundError';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './roles.entity';
 
@@ -11,17 +12,13 @@ export class RolesService {
   ) {}
 
   async create(dto: CreateRoleDto): Promise<Role> {
-    try {
-      const role = await this.roleRepository.create(dto);
-      await this.roleRepository.save(role);
-      return role;
-    } catch (err) {
-      throw new Error(err.message);
-    }
+    const role = await this.roleRepository.create(dto);
+    await this.roleRepository.save(role);
+    return role;
   }
   async getRoleByValue(value: string): Promise<Role> {
     const role = await this.roleRepository.findOne({ where: { value } });
-    if (!role) return null;
+    if (!role) throw new NotFoundError('Role not found');
     return role;
   }
 }
