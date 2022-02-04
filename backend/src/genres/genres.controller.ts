@@ -16,6 +16,8 @@ import { RoleGuard } from '../auth/roles.guard';
 import { CreateGenreDto } from './dto/create-genre.dto';
 import { Genre } from './genre.entity';
 import { GenresService } from './genres.service';
+import { NotFoundError } from '../errors/NotFoundError';
+import { RecordIsExistError } from '../errors/RecordIsExistError';
 
 @ApiTags('Genre controller')
 @Controller('genres')
@@ -33,11 +35,14 @@ export class GenresController {
   @ApiResponse({ status: 200, type: Genre })
   @Get('/:genre_id')
   async getOneGenre(@Param('genre_id') genre_id: string): Promise<Genre> {
-    const genre = await this.genreService.getOne(Number(genre_id));
-    if (!genre) {
-      throw new HttpException('Genre not found', HttpStatus.NOT_FOUND);
+    try {
+      const genre = await this.genreService.getOne(Number(genre_id));
+      return genre;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw new HttpException(err.message, HttpStatus.NOT_FOUND);
+      }
     }
-    return genre;
   }
 
   @ApiOperation({ summary: 'Create new genre' })
@@ -46,11 +51,16 @@ export class GenresController {
   @UseGuards(AuthGuard, RoleGuard)
   @Post('/create')
   async createGenre(@Body() createGenreDto: CreateGenreDto): Promise<Genre> {
-    const genre = await this.genreService.create(createGenreDto);
-    if (!genre) {
-      throw new HttpException('Genre is exist', HttpStatus.BAD_REQUEST);
+    try {
+      const genre = await this.genreService.create(createGenreDto);
+      return genre;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw new HttpException(err.message, HttpStatus.NOT_FOUND);
+      } else if (err instanceof RecordIsExistError) {
+        throw new HttpException(err.message, HttpStatus.BAD_REQUEST);
+      }
     }
-    return genre;
   }
 
   @ApiOperation({ summary: 'Delete genre' })
@@ -59,10 +69,13 @@ export class GenresController {
   @UseGuards(AuthGuard, RoleGuard)
   @Delete('/:genre_id')
   async deleteGenre(@Param('genre_id') genre_id: string): Promise<string> {
-    const genre = await this.genreService.delete(Number(genre_id));
-    if (!genre) {
-      throw new HttpException('Genre not found', HttpStatus.NOT_FOUND);
+    try {
+      const genre = await this.genreService.delete(Number(genre_id));
+      return genre;
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        throw new HttpException(err.message, HttpStatus.NOT_FOUND);
+      }
     }
-    return genre;
   }
 }

@@ -1,7 +1,9 @@
-import { Test } from '@nestjs/testing';
 import { ConfigModule } from '@nestjs/config';
+import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { getConnection, getRepository, Repository } from 'typeorm';
+import { NotFoundError } from '../../errors/NotFoundError';
+import { RecordIsExistError } from '../../errors/RecordIsExistError';
 import { TestHelper } from '../../util/test-helper';
 import { Genre } from '../genre.entity';
 import { GenresService } from '../genres.service';
@@ -62,8 +64,13 @@ describe('GenresService', () => {
       expect(genre.name).toBe('test1');
       expect(genre.description).toBe('test');
     });
-    it('should return null', async () => {
-      expect(await service.getOne(genreId.id + 1)).toBe(null);
+    it('should throw error that genre not found', async () => {
+      try {
+        await service.getOne(genreId.id + 1);
+      } catch (err) {
+        expect(err.message).toBe('Genre not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
   describe('Create genre tests', () => {
@@ -81,10 +88,13 @@ describe('GenresService', () => {
       expect(genre.name).toBe('test3');
       expect(genre.description).toBe('test');
     });
-    it('should return null', async () => {
-      expect(await service.create({ name: 'test3', description: 'test' })).toBe(
-        null,
-      );
+    it('should throw error that genre is exist', async () => {
+      try {
+        await service.create({ name: 'test3', description: 'test' });
+      } catch (err) {
+        expect(err.message).toBe('Genre is exist');
+        expect(err).toBeInstanceOf(RecordIsExistError);
+      }
     });
   });
   describe('Delete genre tests', () => {
@@ -97,8 +107,13 @@ describe('GenresService', () => {
 
       expect(genre).toBe('Genre was deleted');
     });
-    it('should return null', async () => {
-      expect(await service.delete(genreId.id + 1)).toBe(null);
+    it('should throw error that genre not found', async () => {
+      try {
+        await service.delete(genreId.id + 1);
+      } catch (err) {
+        expect(err.message).toBe('Genre not found');
+        expect(err).toBeInstanceOf(NotFoundError);
+      }
     });
   });
 });

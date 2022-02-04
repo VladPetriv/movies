@@ -41,12 +41,6 @@ export class FavouriteService {
       },
     });
     const movie: Movie = await this.movieService.getOneMovie(dto.movie_id);
-    if (!movie || !favourite) {
-      throw new HttpException(
-        'Movie or favourite not found',
-        HttpStatus.NOT_FOUND,
-      );
-    }
     const favouriteItem: FavouriteItem =
       await this.favouriteItemRepository.create({
         favourite: favourite,
