@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
+import { NotFoundError } from '../errors/NotFoundError';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { User } from '../users/user.entity';
 import { UsersService } from '../users/users.service';
@@ -17,19 +18,20 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
   async registration(dto: CreateUserDto) {
-    const candidate = await this.userService.getUserByEmail(dto.email);
-    if (candidate) {
-      throw new HttpException(
-        'User with this email is exist',
-        HttpStatus.BAD_REQUEST,
-      );
+    try {
+      const candidate = await this.userService.getUserByEmail(dto.email);
+      if (candidate) {
+        throw new HttpException(
+          'User with this email is exist',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return this.configureUser(dto);
+    } catch (err) {
+      if (err instanceof NotFoundError) {
+        return this.configureUser(dto);
+      }
     }
-    const hashedPassword = await bcrypt.hash(dto.password, 5);
-    const user = await this.userService.createUser({
-      ...dto,
-      password: hashedPassword,
-    });
-    return this.generateToken(user);
   }
   async login(dto: CreateUserDto) {
     const user = await this.validateUser(dto);
@@ -51,5 +53,14 @@ export class AuthService {
       return user;
     }
     throw new UnauthorizedException({ message: 'Incorrect email or password' });
+  }
+
+  private async configureUser(dto: CreateUserDto) {
+    const hashedPassword = await bcrypt.hash(dto.password, 5);
+    const user = await this.userService.createUser({
+      ...dto,
+      password: hashedPassword,
+    });
+    return this.generateToken(user);
   }
 }
